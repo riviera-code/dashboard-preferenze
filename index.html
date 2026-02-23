@@ -1,570 +1,407 @@
-import React, { useState, useMemo } from 'react';
-import { 
-  Users, 
-  Target, 
-  TrendingDown, 
-  TrendingUp, 
-  Map, 
-  AlertCircle, 
-  ShieldCheck,
-  Bike,
-  UserPlus,
-  BarChart3,
-  ChevronRight,
-  Info,
-  Maximize2,
-  PieChart,
-  LayoutDashboard,
-  Search,
-  ChevronDown,
-  ChevronUp
-} from 'lucide-react';
-
-const SECTION_NAMES = [
-  "Arziglia",
-  "Centro-Est",
-  "Centro",
-  "Via Vittorio Veneto - Centro-Ovest",
-  "Via Pasteur",
-  "Bordighera Alta",
-  "Sasso",
-  "Piani di Borghetto",
-  "Borghetto",
-  "Due Strade"
-];
-
-const App = () => {
-  // --- DATA SOURCE ---
-  const candidatesData = [
-    { name: "BASSI M.", totals: [35, 10, 23, 15, 15, 24, 34, 30, 22, 25], year: 2018 },
-    { name: "ALBANESE A.", totals: [18, 16, 26, 26, 40, 28, 13, 20, 24, 37], year: 2023 },
-    { name: "DEBENEDETTI F.", totals: [51, 38, 21, 13, 18, 35, 28, 9, 12, 16], year: 2023 },
-    { name: "PIANTONI S.", totals: [51, 10, 20, 11, 15, 20, 24, 14, 22, 12], year: 2023 },
-    { name: "MARIELLA M.", totals: [12, 13, 8, 22, 34, 13, 12, 23, 34, 25], year: 2023 },
-    { name: "ZAGNI M.", totals: [26, 6, 15, 8, 9, 13, 35, 24, 12, 10], year: 2023 },
-    { name: "BERTAINA F.", totals: [19, 23, 21, 23, 14, 3, 8, 11, 8, 19], year: 2018 },
-    { name: "DI VITO M.", totals: [17, 12, 10, 8, 4, 11, 21, 2, 5, 11], year: 2023 },
-    { name: "BONAVIA B.", totals: [18, 7, 17, 16, 4, 5, 8, 11, 15, 6], year: 2023 },
-    { name: "GAZZANO G.", totals: [12, 6, 5, 13, 14, 3, 21, 5, 7, 5], year: 2023 },
-    { name: "BOZZARELLI M.", totals: [4, 6, 13, 8, 13, 6, 11, 15, 8, 13], year: 2023 }
-  ];
-
-  const newCandidates = [
-    { name: "TRUCCHI & MERLO", target: 300, icon: <Bike className="w-5 h-5" /> },
-    { name: "GUGLIELMI", target: 140, icon: <UserPlus className="w-5 h-5" /> }
-  ];
-
-  const orphans = [
-    { name: "Filocamo", total: 137, mainSez: "Sasso (61 voti)", sezIndex: 6 },
-    { name: "Moreno", total: 151, mainSez: "V. Veneto (27) / B. Alta (21)", sezIndex: 3 },
-    { name: "Gozzi", total: 95, mainSez: "Centro (20)", sezIndex: 2 },
-    { name: "Oggero", total: 86, mainSez: "Bordighera Alta (17)", sezIndex: 5 },
-    { name: "Traverso", total: 134, mainSez: "Arziglia (42)", sezIndex: 0 },
-    { name: "Barone", total: 91, mainSez: "Via Pasteur (13)", sezIndex: 4 },
-    { name: "Gulifa", total: 76, mainSez: "Borghetto (44)", sezIndex: 8 },
-    { name: "Zunino", total: 56, mainSez: "Bordighera Alta (12)", sezIndex: 5 }
-  ];
-
-  // --- STATE ---
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [recoveryRate, setRecoveryRate] = useState(50);
-  const [prudentialLoss, setPrudentialLoss] = useState(40);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [expandedCandidate, setExpandedCandidate] = useState(null);
-
-  // --- COMPUTED DATA ---
-  const processedCandidates = useMemo(() => {
-    return candidatesData.map(c => {
-      const total = c.totals.reduce((a, b) => a + b, 0);
-      const maxVal = Math.max(...c.totals);
-      const minVal = Math.min(...c.totals);
-      const bestSezIdx = c.totals.indexOf(maxVal);
-      const worstSezIdx = c.totals.indexOf(minVal);
-      return { 
-        ...c, 
-        total, 
-        bestSezName: SECTION_NAMES[bestSezIdx], 
-        worstSezName: SECTION_NAMES[worstSezIdx], 
-        maxVal, 
-        minVal 
-      };
-    }).sort((a, b) => b.total - a.total);
-  }, []);
-
-  const sectionsData = useMemo(() => {
-    return Array.from({ length: 10 }, (_, i) => {
-      const candidatesInSez = processedCandidates.map(c => ({
-        name: c.name,
-        votes: c.totals[i]
-      })).sort((a, b) => b.votes - a.votes);
-      
-      const orphanVotes = orphans
-        .filter(o => o.sezIndex === i || (o.mainSez.includes(SECTION_NAMES[i])))
-        .reduce((acc, curr) => acc + (curr.sezIndex === i ? curr.total : 10), 0);
-
-      return {
-        id: i + 1,
-        name: SECTION_NAMES[i],
-        topCandidate: candidatesInSez[0],
-        totalHistorical: candidatesInSez.reduce((acc, c) => acc + c.votes, 0),
-        orphanPotential: orphanVotes
-      };
-    });
-  }, [processedCandidates]);
-
-  const totalOrphans = orphans.reduce((acc, curr) => acc + curr.total, 0);
-  const totalHistorical = processedCandidates.reduce((acc, curr) => acc + curr.total, 0);
-  const currentPrudential = totalHistorical - (processedCandidates.length * prudentialLoss);
-  const newTargetTotal = newCandidates.reduce((acc, n) => acc + n.target, 0);
-  const recoveredOrphans = Math.round(totalOrphans * (recoveryRate / 100));
-  const finalProjection = currentPrudential + newTargetTotal + recoveredOrphans;
-
-  // --- COMPONENTS ---
-  const Logo = ({ size = "md" }) => {
-    const scale = size === "lg" ? 2 : size === "sm" ? 0.6 : 1;
-    const dimension = 60 * scale;
-    return (
-      <div 
-        className="relative flex items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-white" 
-        style={{ width: dimension, height: dimension }}
-      >
-        <img 
-          src="https://bordigheradomani.it/img/logo.png" 
-          alt="Logo Bordighera Domani"
-          className="w-full h-full object-contain"
-          onError={(e) => {
-            // Fallback in case loading fails
-            e.target.style.display = 'none';
-            e.target.parentNode.innerHTML = '<div class="flex items-center justify-center w-full h-full bg-blue-800 text-white font-black text-[10px]">BD</div>';
-          }}
-        />
-      </div>
-    );
-  };
-
-  const StatCard = ({ title, value, sub, icon: Icon, color }) => (
-    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-      <div className="flex justify-between items-start mb-2">
-        <div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{title}</p>
-          <p className={`text-2xl font-black ${color}`}>{value}</p>
-        </div>
-        <div className={`p-2 rounded-xl bg-opacity-10 ${color.replace('text-', 'bg-').replace('900', '100')}`}>
-          <Icon size={20} className={color} />
-        </div>
-      </div>
-      <p className="text-[10px] text-slate-500 font-medium uppercase">{sub}</p>
-    </div>
-  );
-
-  return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
-      <div className="bg-red-600 text-white text-[10px] py-1 text-center font-bold tracking-[0.2em] uppercase">
-        Riservato: Analisi Strategica Interna - Bordighera Domani
-      </div>
-
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-20">
-        <div className="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Logo />
-            <div>
-              <h1 className="text-xl font-extrabold tracking-tighter text-blue-950 leading-none">BORDIGHERA DOMANI</h1>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse"></span>
-                <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Election Strategy Hub</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="hidden lg:flex items-center gap-4 bg-slate-50 p-2 rounded-2xl border border-slate-100">
-             <div className="px-4 py-1 border-r border-slate-200">
-                <p className="text-[10px] text-slate-400 font-bold uppercase">Potenziale Attuale</p>
-                <p className="text-lg font-black text-blue-700">{finalProjection}</p>
-             </div>
-             <div className="px-4 py-1">
-                <p className="text-[10px] text-slate-400 font-bold uppercase">Target Vittoria</p>
-                <p className="text-lg font-black text-slate-800">2.650</p>
-             </div>
-          </div>
-        </div>
-      </header>
-
-      <nav className="bg-white border-b border-slate-200 overflow-x-auto no-scrollbar">
-        <div className="max-w-6xl mx-auto px-4 flex">
-          {[
-            { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-            { id: 'candidates', label: 'Analisi Candidati', icon: Users },
-            { id: 'sections', label: 'Analisi Territorio', icon: Map },
-            { id: 'simulator', label: 'Simulatore Voti', icon: Target }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 py-4 px-6 border-b-2 transition-all font-bold text-[11px] uppercase tracking-widest whitespace-nowrap ${
-                activeTab === tab.id 
-                ? 'border-blue-600 text-blue-700 bg-blue-50/30' 
-                : 'border-transparent text-slate-400 hover:text-slate-600'
-              }`}
-            >
-              <tab.icon size={16} />
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </nav>
-
-      <main className="max-w-6xl mx-auto px-4 py-8">
-
-        {/* --- DASHBOARD VIEW --- */}
-        {activeTab === 'dashboard' && (
-          <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard title="Preferenze Storiche" value={totalHistorical} sub="Base Storica Candidati" icon={PieChart} color="text-slate-900" />
-              <StatCard title="Potenziale Orfani" value={totalOrphans} sub="Eredità Ex Candidati" icon={Target} color="text-amber-600" />
-              <StatCard title="Target Ingressi" value={newTargetTotal} sub="Trucchi/Merlo/Guglielmi" icon={UserPlus} color="text-blue-600" />
-              <StatCard title="Stima Finale" value={finalProjection} sub="Calcolo Dinamico" icon={ShieldCheck} color="text-emerald-600" />
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 space-y-6">
-                <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                  <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center gap-2">
-                    <TrendingUp className="text-blue-600" size={20} />
-                    Top Candidato per Sezione
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                    {sectionsData.map(sec => (
-                      <div key={sec.id} className="p-4 rounded-xl border border-slate-100 bg-slate-50 flex flex-col items-center text-center">
-                        <span className="text-[9px] font-black text-slate-400 uppercase mb-2 truncate max-w-full" title={sec.name}>{sec.name}</span>
-                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm mb-2 border border-blue-100 overflow-hidden font-black text-blue-700 text-xs">
-                          {sec.topCandidate.name.split(' ')[0][0]}
-                        </div>
-                        <p className="text-[10px] font-bold text-slate-800 leading-tight">{sec.topCandidate.name}</p>
-                        <p className="text-[11px] font-black text-blue-600 mt-1">{sec.topCandidate.votes} voti</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-blue-900 rounded-3xl p-8 text-white relative overflow-hidden shadow-2xl">
-                  <div className="relative z-10">
-                    <h3 className="text-2xl font-black mb-2">Piano Strategico Sezioni</h3>
-                    <p className="text-blue-300 text-sm mb-6 max-w-lg">Identificazione delle aree critiche dove intercettare i voti orfani.</p>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-                        <p className="font-black text-sm text-red-400 mb-1">Focus Recupero: Sasso & Borghetto</p>
-                        <p className="text-xs text-slate-300">Presidio territoriale necessario per intercettare l'eredità Filocamo e Gulifa nelle sezioni periferiche.</p>
-                      </div>
-                      <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-                        <p className="font-black text-sm text-blue-400 mb-1">Consolidamento: Pasteur & Arziglia</p>
-                        <p className="text-xs text-slate-300">Zone a forte trazione Bassi/Debenedetti da proteggere con campagne mirate di ascolto.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                 <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                    <h3 className="text-[11px] font-black text-slate-800 mb-4 uppercase tracking-widest">Classifica Storica</h3>
-                    <div className="space-y-4">
-                      {processedCandidates.slice(0, 6).map((c, i) => (
-                        <div key={i} className="flex items-center justify-between group cursor-default">
-                          <div className="flex items-center gap-3">
-                            <span className="text-[10px] font-black text-slate-300 w-4">#{(i+1)}</span>
-                            <p className="text-xs font-bold text-slate-700 group-hover:text-blue-600 transition-colors">{c.name}</p>
-                          </div>
-                          <span className="text-xs font-black bg-blue-50 text-blue-700 px-2 py-0.5 rounded">{c.total}</span>
-                        </div>
-                      ))}
-                    </div>
-                 </div>
-
-                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Info className="text-blue-600" size={18} />
-                      <h3 className="text-[11px] font-black text-slate-800 uppercase tracking-widest">Nota Metodologica</h3>
-                    </div>
-                    <p className="text-[11px] text-slate-500 leading-relaxed">
-                      La stima finale è calcolata applicando una <strong>decurtazione prudenziale di {prudentialLoss} voti</strong> per ogni candidato storico, sommando poi il target nominale dei nuovi ingressi e il <strong>{recoveryRate}%</strong> del bacino voti orfani.
-                    </p>
-                 </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* --- CANDIDATES LIST --- */}
-        {activeTab === 'candidates' && (
-          <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-              <h2 className="text-xl font-black text-slate-800">Dettaglio Candidati per Sezione</h2>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                <input 
-                  type="text" 
-                  placeholder="Cerca per nome..." 
-                  className="pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-500 w-full md:w-64"
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              {processedCandidates
-                .filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()))
-                .map((cand, idx) => (
-                <div key={idx} className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                  <div 
-                    className="p-5 flex flex-col md:flex-row justify-between items-center cursor-pointer hover:bg-slate-50 transition-colors"
-                    onClick={() => setExpandedCandidate(expandedCandidate === idx ? null : idx)}
-                  >
-                    <div className="flex items-center gap-4 mb-4 md:mb-0">
-                      <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center font-black text-blue-700 text-lg overflow-hidden">
-                         <span className="z-10">{cand.name.split(' ')[0][0]}</span>
-                      </div>
-                      <div>
-                        <h3 className="font-black text-slate-800 text-lg">{cand.name}</h3>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Storico: {cand.year} • Totale: {cand.total} voti</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-8">
-                       <div className="text-center hidden sm:block">
-                          <p className="text-[9px] font-black text-emerald-500 uppercase">Fortino</p>
-                          <p className="text-xs font-bold text-slate-700">{cand.bestSezName}</p>
-                       </div>
-                       <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden hidden md:block">
-                          <div className="h-full bg-blue-600" style={{ width: `${(cand.total / 500) * 100}%` }}></div>
-                       </div>
-                       {expandedCandidate === idx ? <ChevronUp className="text-slate-400" /> : <ChevronDown className="text-slate-400" />}
-                    </div>
-                  </div>
-                  
-                  {expandedCandidate === idx && (
-                    <div className="p-6 border-t border-slate-100 bg-slate-50/50 animate-in fade-in slide-in-from-top-2">
-                       <h4 className="text-[11px] font-black text-blue-900 uppercase tracking-widest mb-4">Panoramica Risultati per Sezione</h4>
-                       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                          {cand.totals.map((v, i) => (
-                            <div key={i} className="bg-white p-3 rounded-xl border border-slate-200 text-center shadow-sm">
-                               <p className="text-[9px] font-bold text-slate-400 uppercase truncate mb-1" title={SECTION_NAMES[i]}>
-                                 {SECTION_NAMES[i]}
-                               </p>
-                               <p className={`text-lg font-black ${v === cand.maxVal ? 'text-emerald-600' : v === cand.minVal ? 'text-rose-600' : 'text-slate-800'}`}>
-                                 {v}
-                               </p>
-                               <p className="text-[8px] font-bold text-slate-300 uppercase tracking-tighter">voti</p>
-                            </div>
-                          ))}
-                       </div>
-                       
-                       <div className="mt-6 flex flex-col sm:flex-row gap-4">
-                          <div className="flex-1 p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-3">
-                             <TrendingUp className="text-emerald-600" size={16} />
-                             <p className="text-[11px] font-bold text-emerald-800">Massima Efficacia a <strong>{cand.bestSezName}</strong> ({cand.maxVal} voti)</p>
-                          </div>
-                          <div className="flex-1 p-3 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-3">
-                             <TrendingDown className="text-rose-600" size={16} />
-                             <p className="text-[11px] font-bold text-rose-800">Margine di Miglioramento a <strong>{cand.worstSezName}</strong> ({cand.minVal} voti)</p>
-                          </div>
-                       </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* --- SECTIONS MAP --- */}
-        {activeTab === 'sections' && (
-          <div className="space-y-8 animate-in zoom-in-95 duration-500">
-            <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm">
-              <div className="mb-8">
-                <h2 className="text-2xl font-black text-slate-800">Geografia Elettorale</h2>
-                <p className="text-slate-500 text-sm">Analisi della forza della lista sul territorio suddivisa per aree urbane.</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                {sectionsData.map(sec => (
-                  <div key={sec.id} className="relative group p-6 rounded-2xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/20 transition-all cursor-default overflow-hidden bg-white">
-                    <div className="absolute top-2 right-4 text-4xl font-black text-slate-50 group-hover:text-blue-50 transition-colors">{sec.id}</div>
-                    <div className="relative z-10">
-                      <p className="text-[10px] font-black text-blue-600 uppercase mb-4 tracking-widest truncate" title={sec.name}>{sec.name}</p>
-                      
-                      <div className="space-y-4">
-                        <div>
-                          <p className="text-[9px] font-bold text-slate-400 uppercase mb-1">Dominante</p>
-                          <p className="text-sm font-bold text-slate-800 truncate">{sec.topCandidate.name}</p>
-                        </div>
-                        
-                        <div>
-                          <p className="text-[9px] font-bold text-amber-600 uppercase mb-1">Eredità Orfani</p>
-                          <p className="text-lg font-black text-slate-800">{sec.orphanPotential} <span className="text-[10px] font-normal text-slate-400">voti</span></p>
-                        </div>
-                      </div>
-
-                      <div className="mt-6 pt-4 border-t border-slate-100">
-                         <div className="flex justify-between items-center text-[10px] font-bold">
-                            <span className="text-slate-400">Storico Sez.</span>
-                            <span className="text-slate-800 font-black">{sec.totalHistorical}</span>
-                         </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-slate-900 rounded-3xl p-8 text-white flex flex-col md:flex-row items-center gap-8 shadow-xl">
-               <div className="md:w-1/3 text-center">
-                  <div className="p-4 bg-white/10 rounded-2xl border border-white/10">
-                    <Map className="mx-auto mb-2 text-blue-400" />
-                    <h4 className="font-black text-lg">Distribuzione Strategica</h4>
-                  </div>
-               </div>
-               <div className="md:w-2/3">
-                  <p className="text-slate-400 text-sm leading-relaxed">
-                    L'analisi evidenzia che la forza di <strong>Bordighera Domani</strong> è storicamente concentrata nel quadrante <strong>Centro/Via Pasteur</strong>. Le sezioni periferiche come <strong>Sasso</strong> e <strong>Piani di Borghetto</strong> presentano i volumi di voti orfani più elevati, offrendo l'opportunità di una crescita verticale se presidiate correttamente con un programma focalizzato sulle frazioni.
-                  </p>
-               </div>
-            </div>
-          </div>
-        )}
-
-        {/* --- SIMULATOR VIEW --- */}
-        {activeTab === 'simulator' && (
-          <div className="space-y-8 animate-in fade-in duration-500 max-w-4xl mx-auto">
-            <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm">
-              <h2 className="text-2xl font-black text-slate-800 mb-8 flex items-center gap-2">
-                <Target size={24} className="text-amber-500" />
-                Simulatore Obiettivi
-              </h2>
-
-              <div className="space-y-12">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <h4 className="font-bold text-slate-700 text-sm italic">Tasso Recupero Voti Orfani ({totalOrphans} totali)</h4>
-                      <p className="text-xs text-slate-400 font-medium">Percentuale di voti intercettati dagli ex candidati Bassi che non corrono più.</p>
-                    </div>
-                    <span className="text-2xl font-black text-amber-600">{recoveryRate}%</span>
-                  </div>
-                  <input 
-                    type="range" 
-                    min="0" max="100" step="5"
-                    value={recoveryRate}
-                    onChange={(e) => setRecoveryRate(parseInt(e.target.value))}
-                    className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-amber-500"
-                  />
-                  <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
-                    <span>Recupero Zero</span>
-                    <span>Target (+{recoveredOrphans} voti)</span>
-                    <span>Recupero Totale</span>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <h4 className="font-bold text-slate-700 text-sm italic">Erosione Prudenziale Candidati Storici</h4>
-                      <p className="text-xs text-slate-400 font-medium">Perdita media di voti stimata per ogni membro confermato (stima prudenziale).</p>
-                    </div>
-                    <span className="text-2xl font-black text-rose-600">-{prudentialLoss}</span>
-                  </div>
-                  <input 
-                    type="range" 
-                    min="0" max="100" step="5"
-                    value={prudentialLoss}
-                    onChange={(e) => setPrudentialLoss(parseInt(e.target.value))}
-                    className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-rose-500"
-                  />
-                   <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
-                    <span>Mantenimento Totale</span>
-                    <span>Penalità Lista (-{prudentialLoss * processedCandidates.length})</span>
-                    <span>Forte Defezione</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
-                  <h4 className="text-[11px] font-black text-slate-400 uppercase mb-6 tracking-widest">Scomposizione Potenziale</h4>
-                  <div className="space-y-4">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-500 italic">Base Storica Confermata</span>
-                      <span className="font-bold text-slate-800">{currentPrudential}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-500 italic">Target Nuovi Ingressi</span>
-                      <span className="font-bold text-blue-600">+{newTargetTotal}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-slate-500 italic">Voti Orfani Intercettati</span>
-                      <span className="font-bold text-amber-600">+{recoveredOrphans}</span>
-                    </div>
-                    <div className="pt-4 border-t border-slate-100 flex justify-between items-baseline">
-                      <span className="text-lg font-black text-slate-800">TOTALE STIMATO</span>
-                      <span className="text-4xl font-black text-blue-700 tracking-tighter">{finalProjection}</span>
-                    </div>
-                  </div>
-               </div>
-
-               <div className="bg-blue-900 rounded-3xl p-8 text-white flex flex-col justify-center items-center text-center shadow-xl">
-                  <div className={`p-5 rounded-3xl mb-4 ${finalProjection >= 2650 ? 'bg-emerald-500' : 'bg-red-500'}`}>
-                    <BarChart3 size={32} />
-                  </div>
-                  <h4 className="text-xl font-black mb-2 uppercase tracking-tighter">
-                    {finalProjection >= 2650 ? 'Scenario: Vittoria' : 'Scenario: Alert'}
-                  </h4>
-                  <p className="text-xs text-blue-300 leading-relaxed mb-6">
-                    {finalProjection >= 2650 
-                      ? "Con questi parametri la soglia di governo (stimata a 2.650 voti) è ampiamente superata." 
-                      : "Attenzione: I parametri attuali portano la lista sotto la soglia di sicurezza di 2.650 voti."}
-                  </p>
-                  <div className="w-full bg-white/10 h-3 rounded-full overflow-hidden mb-2">
-                    <div className="h-full bg-blue-500 transition-all duration-500" style={{ width: `${Math.min((finalProjection / 2800) * 100, 100)}%` }}></div>
-                  </div>
-                  <p className="text-[9px] text-blue-400 font-black uppercase">Capacità Elettorale vs Benchmark Vittoria</p>
-               </div>
-            </div>
-          </div>
-        )}
-
-      </main>
-
-      {/* Mobile Footer Data Bar */}
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 w-[92%] max-w-lg lg:hidden">
-        <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-4 border border-slate-200 shadow-2xl flex items-center justify-between">
-          <div className="flex items-center gap-3">
-             <Logo size="sm" />
-             <div>
-                <p className="text-[9px] text-slate-400 font-bold uppercase leading-none">Proiezione</p>
-                <p className="text-lg font-black text-blue-900 leading-none mt-1">{finalProjection}</p>
-             </div>
-          </div>
-          <div className="h-8 w-[1px] bg-slate-200"></div>
-          <div className="text-right">
-             <p className="text-[9px] text-slate-400 font-bold uppercase leading-none">Benchmark</p>
-             <p className="text-lg font-black text-slate-800 leading-none mt-1">2.650</p>
-          </div>
-        </div>
-      </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bordighera Domani - Analisi Strategica</title>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
         @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slide-in-from-bottom-4 { from { transform: translateY(1rem); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes slide-in-from-top-2 { from { transform: translateY(-0.5rem); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes zoom-in-95 { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .animate-in { animation: fade-in 0.3s ease-out; }
-        .duration-500 { animation-duration: 0.5s; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      `}} />
-    </div>
-  );
-};
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div id="root"></div>
 
-export default App;
+    <script type="text/babel">
+        const { useState, useMemo, useEffect } = React;
+
+        // Custom Hook for Lucide Icons in static HTML
+        const Icon = ({ name, size = 16, className = "" }) => {
+            useEffect(() => {
+                lucide.createIcons();
+            }, [name]);
+            return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
+        };
+
+        const SECTION_NAMES = [
+            "Arziglia",
+            "Centro-Est",
+            "Centro",
+            "Via Vittorio Veneto - Centro-Ovest",
+            "Via Pasteur",
+            "Bordighera Alta",
+            "Sasso",
+            "Piani di Borghetto",
+            "Borghetto",
+            "Due Strade"
+        ];
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('dashboard');
+            const [recoveryRate, setRecoveryRate] = useState(50);
+            const [prudentialLoss, setPrudentialLoss] = useState(25);
+            const [searchQuery, setSearchQuery] = useState('');
+            const [expandedCandidate, setExpandedCandidate] = useState(null);
+
+            const candidatesData = [
+                { name: "BASSI M.", totals: [35, 10, 23, 15, 15, 24, 34, 30, 22, 25], year: 2018 },
+                { name: "ALBANESE A.", totals: [14, 18, 22, 28, 41, 25, 12, 18, 28, 41], year: 2023 },
+                { name: "DEBENEDETTI F.", totals: [31, 28, 11, 13, 18, 25, 18, 9, 12, 16], year: 2023 },
+                { name: "PIANTONI S.", totals: [31, 10, 20, 11, 15, 20, 14, 10, 12, 10], year: 2023 },
+                { name: "MARIELLA M.", totals: [12, 13, 8, 22, 34, 13, 12, 23, 34, 55], year: 2023 },
+                { name: "ZAGNI M.", totals: [16, 12, 15, 18, 19, 13, 35, 24, 20, 10], year: 2023 },
+                { name: "BERTAINA F.", totals: [19, 23, 21, 23, 14, 3, 8, 11, 8, 19], year: 2018 },
+                { name: "DI VITO M.", totals: [10, 12, 10, 8, 14, 11, 21, 5, 5, 5], year: 2023 },
+                { name: "BONAVIA B.", totals: [12, 7, 12, 16, 10, 15, 8, 11, 15, 4], year: 2023 },
+                { name: "GAZZANO G.", totals: [8, 6, 5, 13, 14, 3, 11, 5, 10, 5], year: 2023 },
+                { name: "BOZZARELLI M.", totals: [4, 6, 13, 8, 13, 6, 11, 15, 6, 8], year: 2023 }
+            ];
+
+            const newCandidates = [
+                { name: "TRUCCHI & MERLO", target: 300, icon: "bike" },
+                { name: "GUGLIELMI", target: 140, icon: "user-plus" }
+            ];
+
+            const orphans = [
+                { name: "Filocamo", total: 137, mainSez: "Sasso (61)", sezIndex: 6 },
+                { name: "Moreno", total: 151, mainSez: "Centro-Ovest (27)", sezIndex: 3 },
+                { name: "Gozzi", total: 95, mainSez: "Centro (20)", sezIndex: 2 },
+                { name: "Oggero", total: 86, mainSez: "Bordighera Alta (17)", sezIndex: 5 },
+                { name: "Traverso", total: 134, mainSez: "Arziglia (42)", sezIndex: 0 },
+                { name: "Barone", total: 91, mainSez: "Via Pasteur (13)", sezIndex: 4 },
+                { name: "Gulifa", total: 76, mainSez: "Borghetto (44)", sezIndex: 8 },
+                { name: "Zunino", total: 56, mainSez: "Bordighera Alta (12)", sezIndex: 5 }
+            ];
+
+            const processedCandidates = useMemo(() => {
+                return candidatesData.map(c => {
+                    const total = c.totals.reduce((a, b) => a + b, 0);
+                    const maxVal = Math.max(...c.totals);
+                    const minVal = Math.min(...c.totals);
+                    const bestSezIdx = c.totals.indexOf(maxVal);
+                    return { 
+                        ...c, 
+                        total, 
+                        bestSezName: SECTION_NAMES[bestSezIdx], 
+                        maxVal, 
+                        minVal 
+                    };
+                }).sort((a, b) => b.total - a.total);
+            }, []);
+
+            const totalOrphans = orphans.reduce((acc, curr) => acc + curr.total, 0);
+            const totalHistorical = processedCandidates.reduce((acc, curr) => acc + curr.total, 0);
+            const currentPrudential = totalHistorical - (processedCandidates.length * prudentialLoss);
+            const newTargetTotal = newCandidates.reduce((acc, n) => acc + n.target, 0);
+            const recoveredOrphans = Math.round(totalOrphans * (recoveryRate / 100));
+            const finalProjection = currentPrudential + newTargetTotal + recoveredOrphans;
+
+            const sectionsData = useMemo(() => {
+                return Array.from({ length: 10 }, (_, i) => {
+                    const candidatesInSez = processedCandidates.map(c => ({
+                        name: c.name,
+                        votes: c.totals[i]
+                    })).sort((a, b) => b.votes - a.votes);
+                    
+                    const orphanVotes = orphans
+                        .filter(o => o.sezIndex === i || (o.mainSez.includes(SECTION_NAMES[i])))
+                        .reduce((acc, curr) => acc + (curr.sezIndex === i ? curr.total : 10), 0);
+
+                    return {
+                        id: i + 1,
+                        name: SECTION_NAMES[i],
+                        topCandidate: candidatesInSez[0],
+                        orphanPotential: orphanVotes
+                    };
+                });
+            }, [processedCandidates]);
+
+            return (
+                <div className="min-h-screen">
+                    <div className="bg-red-600 text-white text-[10px] py-1 text-center font-bold tracking-[0.2em] uppercase">
+                        Riservato: Bordighera Domani - Analisi Elettorale
+                    </div>
+
+                    <header className="bg-white border-b border-slate-200 sticky top-0 z-20">
+                        <div className="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-full overflow-hidden border border-slate-200 bg-white">
+                                    <img src="https://bordigheradomani.it/img/logo.png" alt="Logo" className="w-full h-full object-contain" />
+                                </div>
+                                <div>
+                                    <h1 className="text-xl font-extrabold tracking-tighter text-blue-950 leading-none">BORDIGHERA DOMANI</h1>
+                                    <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest mt-1 italic">Election Strategy Dashboard</p>
+                                </div>
+                            </div>
+                            <div className="hidden lg:flex gap-4">
+                                <div className="px-4 py-1 bg-slate-50 rounded-xl border border-slate-100">
+                                    <p className="text-[9px] text-slate-400 font-bold uppercase">Stima Potenziale</p>
+                                    <p className="text-lg font-black text-blue-700">{finalProjection}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <nav className="bg-white border-b border-slate-200 sticky top-20 z-10 overflow-x-auto no-scrollbar">
+                        <div className="max-w-6xl mx-auto px-4 flex">
+                            {[
+                                { id: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard' },
+                                { id: 'candidates', label: 'Candidati', icon: 'users' },
+                                { id: 'sections', label: 'Territorio', icon: 'map' },
+                                { id: 'simulator', label: 'Simulator', icon: 'target' }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`flex items-center gap-2 py-4 px-6 border-b-2 transition-all font-bold text-[11px] uppercase tracking-widest whitespace-nowrap ${
+                                        activeTab === tab.id ? 'border-blue-600 text-blue-700 bg-blue-50/30' : 'border-transparent text-slate-400 hover:text-slate-600'
+                                    }`}
+                                >
+                                    <Icon name={tab.icon} />
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+                    </nav>
+
+                    <main className="max-w-6xl mx-auto px-4 py-8">
+                        {activeTab === 'dashboard' && (
+                            <div className="space-y-8 animate-in">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase">Base Storica Attiva</p>
+                                        <p className="text-2xl font-black text-slate-900">{totalHistorical} voti</p>
+                                        <p className="text-[9px] text-slate-500 mt-2 italic">Compresi Bassi e Bertaina</p>
+                                    </div>
+                                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                        <p className="text-[10px] font-black text-amber-500 uppercase">Bacino Orfani</p>
+                                        <p className="text-2xl font-black text-amber-600">{totalOrphans}</p>
+                                        <p className="text-[9px] text-slate-500 mt-2">Voti da recuperare</p>
+                                    </div>
+                                    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                        <p className="text-[10px] font-black text-blue-500 uppercase">Obiettivo Nuovi</p>
+                                        <p className="text-2xl font-black text-blue-600">+{newTargetTotal}</p>
+                                    </div>
+                                    <div className="bg-blue-600 p-5 rounded-2xl text-white shadow-lg">
+                                        <p className="text-[10px] font-black uppercase opacity-70">Potenziale Totale</p>
+                                        <p className="text-2xl font-black">{finalProjection}</p>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                    <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-8 shadow-sm">
+                                        <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center gap-2">
+                                            <Icon name="trending-up" className="text-blue-600" />
+                                            Top Candidato per Area
+                                        </h3>
+                                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                                            {sectionsData.map(sec => (
+                                                <div key={sec.id} className="p-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
+                                                    <span className="text-[8px] font-black text-slate-400 uppercase block mb-2">{sec.name}</span>
+                                                    <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center font-black text-blue-700 text-[10px] shadow-sm mx-auto mb-2">
+                                                        {sec.topCandidate.name[0]}
+                                                    </div>
+                                                    <p className="text-[10px] font-bold text-slate-800 truncate">{sec.topCandidate.name.split(' ')[0]}</p>
+                                                    <p className="text-[11px] font-black text-blue-600 mt-1">{sec.topCandidate.votes}v</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="bg-slate-900 rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden">
+                                        <h3 className="text-xl font-black mb-4">Strategic Insight</h3>
+                                        <p className="text-sm text-slate-400 mb-4 leading-relaxed">
+                                            Con il reinserimento di <strong>Bassi</strong> e <strong>Bertaina</strong>, lo zoccolo duro storico sale a {totalHistorical} voti.
+                                        </p>
+                                        <p className="text-sm text-slate-400 leading-relaxed italic">
+                                            Il focus deve rimanere sul recupero degli orfani (Filocamo/Moreno) per blindare la vittoria.
+                                        </p>
+                                        <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-600/20 rounded-full blur-3xl"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'candidates' && (
+                            <div className="space-y-4 animate-in">
+                                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                                    <h2 className="text-xl font-black text-slate-800">Analisi Candidati</h2>
+                                    <div className="relative w-full md:w-64">
+                                        <Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                        <input 
+                                            type="text" 
+                                            placeholder="Cerca candidato..." 
+                                            className="pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-xs font-bold w-full focus:ring-2 focus:ring-blue-500"
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-3">
+                                    {processedCandidates
+                                        .filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                                        .map((cand, idx) => (
+                                        <div key={idx} className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                                            <div 
+                                                className="p-5 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition-colors"
+                                                onClick={() => setExpandedCandidate(expandedCandidate === idx ? null : idx)}
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center font-black text-blue-700">
+                                                        {cand.name[0]}
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="font-black text-slate-800">{cand.name}</h3>
+                                                        <p className="text-[10px] text-slate-400 font-bold uppercase">Totale Storico: {cand.total} voti</p>
+                                                    </div>
+                                                </div>
+                                                <Icon name={expandedCandidate === idx ? "chevron-up" : "chevron-down"} className="text-slate-300" />
+                                            </div>
+                                            {expandedCandidate === idx && (
+                                                <div className="p-6 bg-slate-50/50 border-t border-slate-100 animate-in">
+                                                    <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-10 gap-2">
+                                                        {cand.totals.map((v, i) => (
+                                                            <div key={i} className={`p-3 rounded-xl border ${v === cand.maxVal ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-slate-200'} text-center shadow-sm`}>
+                                                                <p className="text-[8px] font-bold text-slate-400 uppercase truncate mb-1">{SECTION_NAMES[i].split(' ')[0]}</p>
+                                                                <p className={`text-sm font-black ${v === cand.maxVal ? 'text-emerald-700' : 'text-slate-800'}`}>{v}</p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'sections' && (
+                            <div className="space-y-6 animate-in">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                                    {sectionsData.map(sec => (
+                                        <div key={sec.id} className="p-6 rounded-3xl bg-white border border-slate-100 shadow-sm hover:border-blue-400 transition-colors">
+                                            <p className="text-[10px] font-black text-blue-600 uppercase mb-4 tracking-wider">{sec.name}</p>
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <p className="text-[9px] font-bold text-slate-400 uppercase mb-1">Candidato Leader</p>
+                                                    <p className="text-sm font-bold text-slate-800">{sec.topCandidate.name}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[9px] font-bold text-amber-500 uppercase mb-1">Potenziale Orfani</p>
+                                                    <p className="text-xl font-black text-slate-800">{sec.orphanPotential} <span className="text-[10px] font-normal text-slate-400">voti</span></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'simulator' && (
+                            <div className="max-w-4xl mx-auto space-y-8 animate-in">
+                                <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm">
+                                    <h2 className="text-2xl font-black text-slate-800 mb-10 flex items-center gap-3 italic">
+                                        <Icon name="target" className="text-blue-600" />
+                                        Simulatore di Proiezione
+                                    </h2>
+                                    <div className="space-y-12">
+                                        <div className="space-y-4">
+                                            <div className="flex justify-between items-end">
+                                                <div>
+                                                    <h4 className="font-bold text-slate-700 text-sm italic">Erosione Prudenziale Storici</h4>
+                                                    <p className="text-xs text-slate-400">Voti stimati in perdita per candidato confermato.</p>
+                                                </div>
+                                                <span className="text-2xl font-black text-rose-600">-{prudentialLoss}</span>
+                                            </div>
+                                            <input type="range" min="0" max="60" step="5" value={prudentialLoss} onChange={(e) => setPrudentialLoss(parseInt(e.target.value))} className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-rose-500" />
+                                        </div>
+                                        <div className="space-y-4">
+                                            <div className="flex justify-between items-end">
+                                                <div>
+                                                    <h4 className="font-bold text-slate-700 text-sm italic">Tasso Recupero Orfani ({totalOrphans} voti)</h4>
+                                                    <p className="text-xs text-slate-400">Efficacia nel catturare gli ex voti della lista Bassi.</p>
+                                                </div>
+                                                <span className="text-2xl font-black text-amber-600">{recoveryRate}%</span>
+                                            </div>
+                                            <input type="range" min="0" max="100" step="5" value={recoveryRate} onChange={(e) => setRecoveryRate(parseInt(e.target.value))} className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-amber-500" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+                                        <h4 className="text-[11px] font-black text-slate-400 uppercase mb-6 tracking-widest">Scomposizione</h4>
+                                        <div className="space-y-4 text-sm font-medium">
+                                            <div className="flex justify-between text-slate-500">
+                                                <span>Storico Netto ({processedCandidates.length} cand.)</span>
+                                                <span className="font-black text-slate-800">{currentPrudential}</span>
+                                            </div>
+                                            <div className="flex justify-between text-slate-500">
+                                                <span>Target Nuovi Ingressi</span>
+                                                <span className="font-black text-blue-600">+{newTargetTotal}</span>
+                                            </div>
+                                            <div className="flex justify-between text-slate-500">
+                                                <span>Recupero Orfani</span>
+                                                <span className="font-black text-amber-600">+{recoveredOrphans}</span>
+                                            </div>
+                                            <div className="pt-4 border-t border-slate-100 flex justify-between items-baseline">
+                                                <span className="text-lg font-black text-slate-800 tracking-tighter uppercase">Potenziale Finale</span>
+                                                <span className="text-4xl font-black text-blue-700">{finalProjection}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="bg-blue-900 rounded-3xl p-8 text-white text-center flex flex-col items-center justify-center shadow-2xl">
+                                        <div className={`p-5 rounded-3xl mb-4 ${finalProjection >= 2650 ? 'bg-emerald-500' : 'bg-red-500'}`}>
+                                            <Icon name="bar-chart-3" size={32} />
+                                        </div>
+                                        <h4 className="text-xl font-black mb-2 uppercase italic tracking-tighter">
+                                            {finalProjection >= 2650 ? 'Vittoria Probabile' : 'Scenario Rischio'}
+                                        </h4>
+                                        <p className="text-xs text-blue-300 leading-relaxed max-w-[200px]">
+                                            {finalProjection >= 2650 ? "Target governabilità raggiunto." : "Necessario incrementare il recupero orfani."}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+
+                    {/* Mobile Floating Bar */}
+                    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 w-[92%] max-w-lg lg:hidden">
+                        <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-4 border border-slate-200 shadow-2xl flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-100">
+                                    <img src="https://bordigheradomani.it/img/logo.png" alt="Logo" className="w-full h-full object-contain" />
+                                </div>
+                                <div>
+                                    <p className="text-[9px] text-slate-400 font-bold uppercase leading-none">Potenziale</p>
+                                    <p className="text-lg font-black text-blue-900 leading-none mt-1">{finalProjection}</p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-[9px] text-slate-400 font-bold uppercase leading-none">Vittoria</p>
+                                <p className="text-lg font-black text-slate-800 leading-none mt-1">2.650</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
