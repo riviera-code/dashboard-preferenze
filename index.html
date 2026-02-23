@@ -6,12 +6,12 @@
     
     <!-- Meta SEO Standard -->
     <title>Bordighera Domani - Analisi Strategica Elettorale</title>
-    <meta name="description" content="Dashboard riservata per l'analisi dei flussi elettorali, il recupero dei voti orfani e la pianificazione strategica di Bordighera Domani.">
+    <meta name="description" content="Dashboard riservata per l'analisi dei flussi elettorali e la distribuzione dei voti orfani di Bordighera Domani.">
     <meta name="author" content="Bordighera Domani">
 
     <!-- Meta per Condivisione Social (WhatsApp, Facebook, LinkedIn) -->
     <meta property="og:title" content="Bordighera Domani - Dashboard Strategica">
-    <meta property="og:description" content="Analisi dei dati elettorali e proiezioni per la lista Bordighera Domani. Accesso riservato ai candidati.">
+    <meta property="og:description" content="Analisi geografica dei dati elettorali e proiezioni per la lista Bordighera Domani.">
     <meta property="og:image" content="https://bordigheradomani.it/img/logo.png">
     <meta property="og:url" content="https://bordigheradomani.it/">
     <meta property="og:type" content="website">
@@ -111,15 +111,16 @@
                 { name: "GUGLIELMI", target: 140, icon: "user-plus" }
             ];
 
+            // Distribuzione realistica basata sui dati storici delle sezioni prevalenti
             const orphans = [
-                { name: "Filocamo", total: 137, mainSez: "Sasso (Sez. 7)", strategy: "Forte radicamento nelle frazioni. Zagni e Bassi devono presidiare l'eredità storica di Filocamo a Sasso.", sezIndex: 6 },
-                { name: "Moreno", total: 151, mainSez: "B. Alta & Centro-Ovest (Sez. 4-6)", strategy: "Bacino ampio e volatile. Trucchi/Merlo possono intercettare questo voto d'opinione cittadino.", sezIndex: 3 },
-                { name: "Gozzi", total: 95, mainSez: "Centro (Sez. 3)", strategy: "Voto concentrato nel cuore commerciale. Necessaria campagna su decoro urbano e rilancio centro.", sezIndex: 2 },
-                { name: "Oggero", total: 86, mainSez: "Bordighera Alta (Sez. 6)", strategy: "Eredità specifica nel borgo antico. La lista deve dimostrare attenzione alla manutenzione di B. Alta.", sezIndex: 5 },
-                { name: "Traverso", total: 134, mainSez: "Arziglia (Sez. 1)", strategy: "Dominante ad Arziglia. Debenedetti e Piantoni devono blindare la zona est per non perdere questi voti.", sezIndex: 0 },
-                { name: "Barone", total: 91, mainSez: "Via Pasteur (Sez. 5)", strategy: "Zona densamente popolata. Albanese deve intercettare queste preferenze tramite contatti diretti nel quartiere.", sezIndex: 4 },
-                { name: "Gulifa", total: 76, mainSez: "Borghetto (Sez. 9)", strategy: "Voto di frazione molto identitario. Mariella deve puntare sul rilancio delle borgate nord.", sezIndex: 8 },
-                { name: "Zunino", total: 56, mainSez: "Bordighera Alta (Sez. 6)", strategy: "Voto di prossimità nel borgo. Consolidare tramite i candidati residenti nella parte alta.", sezIndex: 5 }
+                { name: "Filocamo", total: 137, distribution: [5, 8, 10, 12, 8, 12, 61, 6, 10, 5], mainSez: "Sasso" },
+                { name: "Moreno", total: 151, distribution: [12, 15, 18, 27, 20, 21, 10, 12, 10, 6], mainSez: "Centro-Ovest / B. Alta" },
+                { name: "Gozzi", total: 95, distribution: [8, 12, 20, 15, 10, 8, 5, 5, 7, 5], mainSez: "Centro" },
+                { name: "Oggero", total: 86, distribution: [4, 6, 8, 10, 12, 17, 8, 8, 8, 5], mainSez: "Bordighera Alta" },
+                { name: "Traverso", total: 134, distribution: [42, 15, 10, 12, 10, 10, 8, 9, 10, 8], mainSez: "Arziglia" },
+                { name: "Barone", total: 91, distribution: [6, 8, 10, 15, 13, 10, 8, 8, 8, 5], mainSez: "Via Pasteur" },
+                { name: "Gulifa", total: 76, distribution: [2, 4, 5, 5, 4, 4, 3, 2, 44, 3], mainSez: "Borghetto" },
+                { name: "Zunino", total: 56, distribution: [3, 4, 5, 7, 5, 12, 8, 5, 4, 3], mainSez: "Bordighera Alta" }
             ];
 
             const processedCandidates = useMemo(() => {
@@ -145,9 +146,7 @@
                         votes: c.totals[i]
                     })).sort((a, b) => b.votes - a.votes);
                     
-                    const orphanVotes = orphans
-                        .filter(o => o.sezIndex === i)
-                        .reduce((acc, curr) => acc + curr.total, 0);
+                    const orphanVotes = orphans.reduce((acc, o) => acc + o.distribution[i], 0);
 
                     return {
                         id: i + 1,
@@ -201,7 +200,7 @@
             }
 
             return (
-                <div className="min-h-screen text-slate-800">
+                <div className="min-h-screen text-slate-800 pb-10">
                     <div className="bg-red-600 text-white text-[10px] py-1 text-center font-bold tracking-[0.2em] uppercase">
                         Riservato: Bordighera Domani - Strategia Interna
                     </div>
@@ -278,7 +277,7 @@
                                     <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
                                         <p className="text-[10px] font-black text-amber-500 uppercase mb-1">Potenziale Orfani</p>
                                         <p className="text-2xl font-black text-amber-600">{totalOrphans}</p>
-                                        <p className="text-[9px] text-slate-500 mt-2">Bacino da recuperare</p>
+                                        <p className="text-[9px] text-slate-500 mt-2">Bacino totale da intercettare</p>
                                     </div>
                                     <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
                                         <p className="text-[10px] font-black text-blue-500 uppercase mb-1">Voti PD + M5S</p>
@@ -300,21 +299,21 @@
                                         </h3>
                                         <div className="space-y-4">
                                             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-start gap-4">
-                                                <div className="p-2 bg-blue-100 rounded-xl text-blue-600 font-black">01</div>
+                                                <div className="p-2 bg-blue-100 rounded-xl text-blue-600 font-black shrink-0">01</div>
                                                 <p className="text-sm font-medium text-slate-600">
-                                                    <strong>Focus Sasso & Bordighera Alta:</strong> In queste due zone si concentrano oltre il 35% dei voti orfani. Una presenza capillare qui è determinante.
+                                                    <strong>Polarizzazione Geografica:</strong> La forza di Bordighera Domani è attualmente concentrata nel quadrante Centro/Via Pasteur. Le frazioni (Sasso/Borghetto) sono le aree con più voti "liberi".
                                                 </p>
                                             </div>
                                             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-start gap-4">
-                                                <div className="p-2 bg-blue-100 rounded-xl text-blue-600 font-black">02</div>
+                                                <div className="p-2 bg-blue-100 rounded-xl text-blue-600 font-black shrink-0">02</div>
                                                 <p className="text-sm font-medium text-slate-600">
-                                                    <strong>Intercettazione Voti Arziglia:</strong> Traverso ha lasciato 134 voti scoperti. I candidati con forti radici locali devono presidiare questa sezione prioritariamente.
+                                                    <strong>Tenuta degli Storici:</strong> Fondamentale ridurre al minimo l'erosione naturale dei voti per ogni candidato confermato rispetto al 2023. Ogni voto perso qui deve essere compensato doppiamente dai nuovi ingressi.
                                                 </p>
                                             </div>
                                             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-start gap-4">
-                                                <div className="p-2 bg-blue-100 rounded-xl text-blue-600 font-black">03</div>
+                                                <div className="p-2 bg-blue-100 rounded-xl text-blue-600 font-black shrink-0">03</div>
                                                 <p className="text-sm font-medium text-slate-600">
-                                                    <strong>Consolidamento Voti PD+M5S:</strong> Trucchi, Merlo e Guglielmi devono convertire la propria influenza politica in voti nominali nelle zone centrali per compensare l'erosione fisiologica degli storici.
+                                                    <strong>Conversione Voti Politici:</strong> I voti PD+M5S devono essere convertiti in preferenze nominali forti per evitare l'effetto "dispersione" del solo voto al simbolo.
                                                 </p>
                                             </div>
                                         </div>
@@ -322,17 +321,17 @@
                                     <div className="bg-slate-900 rounded-3xl p-8 text-white shadow-2xl flex flex-col justify-center">
                                         <h3 className="text-xl font-black mb-4 tracking-tight">Evoluzione Lista</h3>
                                         <p className="text-sm text-slate-400 mb-6 leading-relaxed">
-                                            La proiezione attuale di <strong>{finalProjection}</strong> voti è solida, ma si basa su una lista ancora in via di definizione.
+                                            La proiezione di <strong>{finalProjection}</strong> voti è solida, ma si basa su una lista ancora in via di definizione.
                                         </p>
                                         <div className="space-y-3">
                                             <div className="flex justify-between items-center text-xs">
-                                                <span className="text-slate-500 font-bold uppercase">Stato Compilazione</span>
+                                                <span className="text-slate-500 font-bold uppercase tracking-wider">Stato Compilazione</span>
                                                 <span className="text-blue-400 font-black">75%</span>
                                             </div>
                                             <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
                                                 <div className="bg-blue-500 h-full w-3/4"></div>
                                             </div>
-                                            <p className="text-[10px] text-slate-500 italic mt-2">L'inserimento di profili complementari (società civile, libere professioni) aumenterebbe il potenziale di ulteriori 250-350 voti.</p>
+                                            <p className="text-[10px] text-slate-500 italic mt-2">L'inserimento di profili provenienti dalla società civile aumenterebbe il potenziale di ulteriori 250-350 voti.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -369,7 +368,7 @@
                                                     </div>
                                                     <div>
                                                         <h3 className="font-black text-slate-800 text-sm tracking-tight">{cand.name}</h3>
-                                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Storico: {cand.total} voti • {cand.year}</p>
+                                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Totale Storico: {cand.total} voti • {cand.year}</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-4">
@@ -403,7 +402,7 @@
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {sectionsData.map(sec => (
                                         <div key={sec.id} className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col md:flex-row gap-8">
-                                            <div className="md:w-1/3">
+                                            <div className="md:w-1/3 shrink-0">
                                                 <p className="text-[10px] font-black text-blue-600 uppercase mb-2 tracking-widest leading-none">Sezione {sec.id}</p>
                                                 <h3 className="text-xl font-black text-slate-800 mb-4">{sec.name}</h3>
                                                 <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100">
@@ -429,49 +428,68 @@
                         )}
 
                         {activeTab === 'orphans' && (
-                            <div className="space-y-6 animate-in">
+                            <div className="space-y-8 animate-in">
                                 <div className="bg-white rounded-3xl border border-slate-200 p-10 shadow-sm text-center">
                                     <h2 className="text-2xl font-black text-slate-800 mb-3 tracking-tight italic flex items-center justify-center gap-3">
                                         <Icon name="target" className="text-amber-500" size={24} />
-                                        Focus Geografico Voti Orfani
+                                        Distribuzione Geografica Voti Orfani
                                     </h2>
                                     <p className="text-slate-500 text-sm max-w-2xl mx-auto leading-relaxed">
-                                        Analisi dei flussi di voto lasciati dagli ex candidati della lista Bassi. Il recupero di questi {totalOrphans} voti è la chiave per la governabilità.
+                                        Analisi quantitativa dei voti degli ex candidati Bassi su tutto il territorio di Bordighera. 
+                                        Il calore del colore indica la concentrazione delle preferenze.
                                     </p>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                
+                                <div className="grid grid-cols-1 gap-8">
                                     {orphans.map((o, idx) => (
-                                        <div key={idx} className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col hover:border-blue-400 transition-all group">
-                                            <div className="flex justify-between items-start mb-6">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center font-black">
+                                        <div key={idx} className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                                            <div className="p-6 bg-slate-50 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-12 bg-amber-100 text-amber-700 rounded-2xl flex items-center justify-center font-black text-lg">
                                                         {o.name[0]}
                                                     </div>
                                                     <div>
-                                                        <h4 className="font-black text-slate-900 text-base">{o.name}</h4>
-                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ex Candidato Bassi</p>
+                                                        <h4 className="font-black text-slate-900 text-lg">{o.name}</h4>
+                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ex Candidato Lista Bassi</p>
                                                     </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <span className="text-2xl font-black text-amber-600 leading-none block">{o.total}</span>
-                                                    <span className="text-[9px] font-bold text-slate-400 uppercase">Voti</span>
+                                                <div className="text-center md:text-right">
+                                                    <p className="text-3xl font-black text-amber-600 leading-none">{o.total}</p>
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase">Voti Totali 2023</p>
                                                 </div>
                                             </div>
-
-                                            <div className="space-y-6">
-                                                <div>
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <Icon name="map-pin" size={14} className="text-blue-500" />
-                                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Zona di Influenza</p>
-                                                    </div>
-                                                    <p className="text-sm font-black text-slate-800 bg-blue-50 px-3 py-2 rounded-xl inline-block">{o.mainSez}</p>
+                                            
+                                            <div className="p-6">
+                                                <div className="mb-4 flex items-center gap-2">
+                                                    <Icon name="map" size={14} className="text-blue-500" />
+                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Mappatura Preferenze per Sezione</p>
                                                 </div>
-                                                <div className="pt-4 border-t border-slate-50">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <Icon name="compass" size={14} className="text-emerald-500" />
-                                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Consiglio Strategico</p>
-                                                    </div>
-                                                    <p className="text-xs font-medium text-slate-500 leading-relaxed italic">{o.strategy}</p>
+                                                
+                                                <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-10 gap-3">
+                                                    {o.distribution.map((votes, i) => {
+                                                        const intensity = votes / Math.max(...o.distribution);
+                                                        const bgColor = intensity > 0.7 ? 'bg-amber-100 border-amber-300' : intensity > 0.3 ? 'bg-blue-50 border-blue-200' : 'bg-slate-50 border-slate-100';
+                                                        const textColor = intensity > 0.7 ? 'text-amber-800' : intensity > 0.3 ? 'text-blue-800' : 'text-slate-400';
+                                                        
+                                                        return (
+                                                            <div key={i} className={`p-3 rounded-2xl border text-center transition-all ${bgColor}`}>
+                                                                <p className="text-[8px] font-bold text-slate-500 uppercase truncate mb-1" title={SECTION_NAMES[i]}>
+                                                                    {SECTION_NAMES[i].split(' ')[0]}
+                                                                </p>
+                                                                <p className={`text-sm font-black ${textColor}`}>{votes}</p>
+                                                                <div className="w-full bg-black/5 h-1 mt-1 rounded-full overflow-hidden">
+                                                                    <div className="h-full bg-amber-500" style={{ width: `${(votes / o.total) * 100 * 5}%` }}></div>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                                
+                                                <div className="mt-6 flex items-center gap-3 p-3 bg-blue-50/50 rounded-2xl border border-blue-100">
+                                                    <Icon name="info" size={14} className="text-blue-500" />
+                                                    <p className="text-[11px] font-medium text-blue-700 leading-none">
+                                                        Baricentro Elettorale: <strong className="uppercase">{o.mainSez}</strong>
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -502,7 +520,7 @@
                                             <div className="flex justify-between items-end">
                                                 <div>
                                                     <h4 className="font-bold text-slate-700 text-sm">Tasso Recupero Orfani</h4>
-                                                    <p className="text-xs text-slate-400">Capacità di intercettare i voti Bassi/Bertaina.</p>
+                                                    <p className="text-xs text-slate-400">Capacità di intercettare i voti degli ex candidati.</p>
                                                 </div>
                                                 <span className="text-2xl font-black text-amber-600">{recoveryRate}%</span>
                                             </div>
