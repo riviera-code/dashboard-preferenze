@@ -111,7 +111,6 @@
                 { name: "GUGLIELMI", target: 140, icon: "user-plus" }
             ];
 
-            // Distribuzione realistica basata sui dati storici delle sezioni prevalenti
             const orphans = [
                 { name: "Filocamo", total: 137, distribution: [5, 8, 10, 12, 8, 12, 61, 6, 10, 5], mainSez: "Sasso" },
                 { name: "Moreno", total: 151, distribution: [12, 15, 18, 27, 20, 21, 10, 12, 10, 6], mainSez: "Centro-Ovest / B. Alta" },
@@ -258,6 +257,7 @@
                     </nav>
 
                     <main className="max-w-6xl mx-auto px-4 py-8">
+                        {/* ALERT LISTA INCOMPLETA */}
                         <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-4 text-amber-800 shadow-sm animate-in">
                             <Icon name="alert-triangle" size={20} className="text-amber-500" />
                             <div>
@@ -368,7 +368,7 @@
                                                     </div>
                                                     <div>
                                                         <h3 className="font-black text-slate-800 text-sm tracking-tight">{cand.name}</h3>
-                                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Totale Storico: {cand.total} voti • {cand.year}</p>
+                                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Storico: {cand.total} voti • {cand.year}</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-4">
@@ -436,7 +436,7 @@
                                     </h2>
                                     <p className="text-slate-500 text-sm max-w-2xl mx-auto leading-relaxed">
                                         Analisi quantitativa dei voti degli ex candidati Bassi su tutto il territorio di Bordighera. 
-                                        Il calore del colore indica la concentrazione delle preferenze.
+                                        Il colore indica la concentrazione delle preferenze per singola sezione.
                                     </p>
                                 </div>
                                 
@@ -449,47 +449,53 @@
                                                         {o.name[0]}
                                                     </div>
                                                     <div>
-                                                        <h4 className="font-black text-slate-900 text-lg">{o.name}</h4>
+                                                        <h4 className="font-black text-slate-900 text-lg uppercase tracking-tighter">{o.name}</h4>
                                                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ex Candidato Lista Bassi</p>
                                                     </div>
                                                 </div>
-                                                <div className="text-center md:text-right">
-                                                    <p className="text-3xl font-black text-amber-600 leading-none">{o.total}</p>
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase">Voti Totali 2023</p>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="text-center md:text-right">
+                                                        <p className="text-3xl font-black text-amber-600 leading-none">{o.total}</p>
+                                                        <p className="text-[10px] font-bold text-slate-400 uppercase">Voti Totali 2023</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                             
                                             <div className="p-6">
-                                                <div className="mb-4 flex items-center gap-2">
+                                                <div className="mb-6 flex items-center gap-2">
                                                     <Icon name="map" size={14} className="text-blue-500" />
-                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Mappatura Preferenze per Sezione</p>
+                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Dettaglio Preferenze per Sezione</p>
                                                 </div>
                                                 
-                                                <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-10 gap-3">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
                                                     {o.distribution.map((votes, i) => {
                                                         const intensity = votes / Math.max(...o.distribution);
-                                                        const bgColor = intensity > 0.7 ? 'bg-amber-100 border-amber-300' : intensity > 0.3 ? 'bg-blue-50 border-blue-200' : 'bg-slate-50 border-slate-100';
-                                                        const textColor = intensity > 0.7 ? 'text-amber-800' : intensity > 0.3 ? 'text-blue-800' : 'text-slate-400';
+                                                        const bgColor = intensity > 0.7 ? 'bg-amber-100 border-amber-200' : intensity > 0.3 ? 'bg-blue-50 border-blue-100' : 'bg-white border-slate-100';
+                                                        const textColor = intensity > 0.7 ? 'text-amber-800' : intensity > 0.3 ? 'text-blue-800' : 'text-slate-500';
                                                         
                                                         return (
-                                                            <div key={i} className={`p-3 rounded-2xl border text-center transition-all ${bgColor}`}>
-                                                                <p className="text-[8px] font-bold text-slate-500 uppercase truncate mb-1" title={SECTION_NAMES[i]}>
-                                                                    {SECTION_NAMES[i].split(' ')[0]}
-                                                                </p>
-                                                                <p className={`text-sm font-black ${textColor}`}>{votes}</p>
-                                                                <div className="w-full bg-black/5 h-1 mt-1 rounded-full overflow-hidden">
-                                                                    <div className="h-full bg-amber-500" style={{ width: `${(votes / o.total) * 100 * 5}%` }}></div>
+                                                            <div key={i} className={`flex justify-between items-center p-3 rounded-xl border transition-all ${bgColor}`}>
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">Sez. {i+1}</span>
+                                                                    <span className="text-xs font-bold text-slate-700 truncate max-w-[180px] sm:max-w-none">{SECTION_NAMES[i]}</span>
+                                                                </div>
+                                                                <div className="flex flex-col items-end shrink-0">
+                                                                    <span className={`text-sm font-black ${textColor}`}>{votes} <span className="text-[8px] font-bold opacity-50 uppercase">voti</span></span>
+                                                                    <div className="w-12 bg-black/5 h-1 rounded-full overflow-hidden mt-1">
+                                                                        <div className="h-full bg-amber-500" style={{ width: `${(votes / Math.max(...o.distribution)) * 100}%` }}></div>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         );
                                                     })}
                                                 </div>
                                                 
-                                                <div className="mt-6 flex items-center gap-3 p-3 bg-blue-50/50 rounded-2xl border border-blue-100">
-                                                    <Icon name="info" size={14} className="text-blue-500" />
-                                                    <p className="text-[11px] font-medium text-blue-700 leading-none">
-                                                        Baricentro Elettorale: <strong className="uppercase">{o.mainSez}</strong>
-                                                    </p>
+                                                <div className="mt-8 flex items-center gap-3 p-4 bg-slate-900 rounded-2xl text-white shadow-lg">
+                                                    <Icon name="info" size={18} className="text-blue-400" />
+                                                    <div>
+                                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Baricentro Elettorale</p>
+                                                        <p className="text-sm font-bold uppercase tracking-tight">Massima concentrazione in area: <span className="text-blue-400">{o.mainSez}</span></p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
