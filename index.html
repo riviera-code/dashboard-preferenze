@@ -3,7 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bordighera Domani - Analisi Strategica</title>
+    
+    <!-- Meta SEO Standard -->
+    <title>Bordighera Domani - Analisi Strategica Elettorale</title>
+    <meta name="description" content="Dashboard riservata per l'analisi dei flussi elettorali, il recupero dei voti orfani e la pianificazione strategica di Bordighera Domani.">
+    <meta name="author" content="Bordighera Domani">
+
+    <!-- Meta per Condivisione Social (WhatsApp, Facebook, LinkedIn) -->
+    <meta property="og:title" content="Bordighera Domani - Dashboard Strategica">
+    <meta property="og:description" content="Analisi dei dati elettorali e proiezioni per la lista Bordighera Domani. Accesso riservato ai candidati.">
+    <meta property="og:image" content="https://bordigheradomani.it/img/logo.png">
+    <meta property="og:url" content="https://bordigheradomani.it/">
+    <meta property="og:type" content="website">
+    
     <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -13,6 +25,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    
     <style>
         @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slide-in-from-bottom-4 { from { transform: translateY(1rem); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -99,14 +112,14 @@
             ];
 
             const orphans = [
-                { name: "Filocamo", total: 137, mainSez: "Sasso (61)", sezIndex: 6 },
-                { name: "Moreno", total: 151, mainSez: "Centro-Ovest (27)", sezIndex: 3 },
-                { name: "Gozzi", total: 95, mainSez: "Centro (20)", sezIndex: 2 },
-                { name: "Oggero", total: 86, mainSez: "Bordighera Alta (17)", sezIndex: 5 },
-                { name: "Traverso", total: 134, mainSez: "Arziglia (42)", sezIndex: 0 },
-                { name: "Barone", total: 91, mainSez: "Via Pasteur (13)", sezIndex: 4 },
-                { name: "Gulifa", total: 76, mainSez: "Borghetto (44)", sezIndex: 8 },
-                { name: "Zunino", total: 56, mainSez: "Bordighera Alta (12)", sezIndex: 5 }
+                { name: "Filocamo", total: 137, mainSez: "Sasso (Sez. 7)", strategy: "Forte radicamento nelle frazioni. Zagni e Bassi devono presidiare l'eredità storica di Filocamo a Sasso.", sezIndex: 6 },
+                { name: "Moreno", total: 151, mainSez: "B. Alta & Centro-Ovest (Sez. 4-6)", strategy: "Bacino ampio e volatile. Trucchi/Merlo possono intercettare questo voto d'opinione cittadino.", sezIndex: 3 },
+                { name: "Gozzi", total: 95, mainSez: "Centro (Sez. 3)", strategy: "Voto concentrato nel cuore commerciale. Necessaria campagna su decoro urbano e rilancio centro.", sezIndex: 2 },
+                { name: "Oggero", total: 86, mainSez: "Bordighera Alta (Sez. 6)", strategy: "Eredità specifica nel borgo antico. La lista deve dimostrare attenzione alla manutenzione di B. Alta.", sezIndex: 5 },
+                { name: "Traverso", total: 134, mainSez: "Arziglia (Sez. 1)", strategy: "Dominante ad Arziglia. Debenedetti e Piantoni devono blindare la zona est per non perdere questi voti.", sezIndex: 0 },
+                { name: "Barone", total: 91, mainSez: "Via Pasteur (Sez. 5)", strategy: "Zona densamente popolata. Albanese deve intercettare queste preferenze tramite contatti diretti nel quartiere.", sezIndex: 4 },
+                { name: "Gulifa", total: 76, mainSez: "Borghetto (Sez. 9)", strategy: "Voto di frazione molto identitario. Mariella deve puntare sul rilancio delle borgate nord.", sezIndex: 8 },
+                { name: "Zunino", total: 56, mainSez: "Bordighera Alta (Sez. 6)", strategy: "Voto di prossimità nel borgo. Consolidare tramite i candidati residenti nella parte alta.", sezIndex: 5 }
             ];
 
             const processedCandidates = useMemo(() => {
@@ -145,7 +158,6 @@
                 });
             }, [processedCandidates]);
 
-            // Schermata di Login
             if (!isAuthenticated) {
                 return (
                     <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
@@ -188,7 +200,6 @@
                 );
             }
 
-            // Dashboard Principale (già autenticato)
             return (
                 <div className="min-h-screen text-slate-800">
                     <div className="bg-red-600 text-white text-[10px] py-1 text-center font-bold tracking-[0.2em] uppercase">
@@ -248,7 +259,6 @@
                     </nav>
 
                     <main className="max-w-6xl mx-auto px-4 py-8">
-                        {/* ALERT LISTA INCOMPLETA */}
                         <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-4 text-amber-800 shadow-sm animate-in">
                             <Icon name="alert-triangle" size={20} className="text-amber-500" />
                             <div>
@@ -420,23 +430,49 @@
 
                         {activeTab === 'orphans' && (
                             <div className="space-y-6 animate-in">
-                                <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm text-center">
-                                    <h2 className="text-2xl font-black text-slate-800 mb-2">Analisi Voti Orfani</h2>
-                                    <p className="text-slate-500 text-sm max-w-xl mx-auto">Voti espressi per candidati che non partecipano alla tornata attuale. Rappresentano il bacino di crescita più immediato per la lista.</p>
+                                <div className="bg-white rounded-3xl border border-slate-200 p-10 shadow-sm text-center">
+                                    <h2 className="text-2xl font-black text-slate-800 mb-3 tracking-tight italic flex items-center justify-center gap-3">
+                                        <Icon name="target" className="text-amber-500" size={24} />
+                                        Focus Geografico Voti Orfani
+                                    </h2>
+                                    <p className="text-slate-500 text-sm max-w-2xl mx-auto leading-relaxed">
+                                        Analisi dei flussi di voto lasciati dagli ex candidati della lista Bassi. Il recupero di questi {totalOrphans} voti è la chiave per la governabilità.
+                                    </p>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {orphans.map((o, idx) => (
-                                        <div key={idx} className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-blue-400 transition-colors cursor-default">
-                                            <div>
-                                                <div className="flex justify-between items-start mb-4">
-                                                    <h4 className="font-black text-slate-800 text-sm tracking-tight">{o.name}</h4>
-                                                    <span className="text-amber-600 font-black text-lg leading-none">{o.total}</span>
+                                        <div key={idx} className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col hover:border-blue-400 transition-all group">
+                                            <div className="flex justify-between items-start mb-6">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center font-black">
+                                                        {o.name[0]}
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="font-black text-slate-900 text-base">{o.name}</h4>
+                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ex Candidato Bassi</p>
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <Icon name="map-pin" size={12} className="text-slate-400" />
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase">Focus Geografico</p>
+                                                <div className="text-right">
+                                                    <span className="text-2xl font-black text-amber-600 leading-none block">{o.total}</span>
+                                                    <span className="text-[9px] font-bold text-slate-400 uppercase">Voti</span>
                                                 </div>
-                                                <p className="text-xs font-bold text-slate-700">{o.mainSez}</p>
+                                            </div>
+
+                                            <div className="space-y-6">
+                                                <div>
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <Icon name="map-pin" size={14} className="text-blue-500" />
+                                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Zona di Influenza</p>
+                                                    </div>
+                                                    <p className="text-sm font-black text-slate-800 bg-blue-50 px-3 py-2 rounded-xl inline-block">{o.mainSez}</p>
+                                                </div>
+                                                <div className="pt-4 border-t border-slate-50">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <Icon name="compass" size={14} className="text-emerald-500" />
+                                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Consiglio Strategico</p>
+                                                    </div>
+                                                    <p className="text-xs font-medium text-slate-500 leading-relaxed italic">{o.strategy}</p>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
