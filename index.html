@@ -77,8 +77,11 @@
 
             // --- APP STATE ---
             const [activeTab, setActiveTab] = useState('dashboard');
+            
+            // Impostazioni iniziali: erosione 40 e recupero 50%
             const [recoveryRate, setRecoveryRate] = useState(50);
-            const [prudentialLoss, setPrudentialLoss] = useState(25);
+            const [prudentialLoss, setPrudentialLoss] = useState(40);
+            
             const [searchQuery, setSearchQuery] = useState('');
             const [expandedCandidate, setExpandedCandidate] = useState(null);
 
@@ -257,7 +260,6 @@
                     </nav>
 
                     <main className="max-w-6xl mx-auto px-4 py-8">
-                        {/* ALERT LISTA INCOMPLETA */}
                         <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-4 text-amber-800 shadow-sm animate-in">
                             <Icon name="alert-triangle" size={20} className="text-amber-500" />
                             <div>
@@ -269,25 +271,46 @@
                         {activeTab === 'dashboard' && (
                             <div className="space-y-8 animate-in">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Base Storica Attiva</p>
-                                        <p className="text-2xl font-black text-slate-900">{totalHistorical} <span className="text-sm font-medium">voti</span></p>
-                                        <p className="text-[9px] text-slate-500 mt-2">Dati consolidati candidati storici</p>
+                                    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                                        <div>
+                                            <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Base Storica Attiva</p>
+                                            <p className="text-2xl font-black text-slate-900">{totalHistorical} <span className="text-sm font-medium">voti</span></p>
+                                        </div>
+                                        <p className="text-[9px] text-slate-500 mt-2">Squadra attuale (11 membri)</p>
                                     </div>
-                                    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                                        <p className="text-[10px] font-black text-amber-500 uppercase mb-1">Potenziale Orfani</p>
-                                        <p className="text-2xl font-black text-amber-600">{totalOrphans}</p>
-                                        <p className="text-[9px] text-slate-500 mt-2">Bacino totale da intercettare</p>
+                                    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                                        <div>
+                                            <p className="text-[10px] font-black text-amber-500 uppercase mb-1">Potenziale Orfani</p>
+                                            <p className="text-2xl font-black text-amber-600">{totalOrphans}</p>
+                                        </div>
+                                        <p className="text-[9px] text-slate-500 mt-2">Voti "orfani" Bassi 2023</p>
                                     </div>
-                                    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                                        <p className="text-[10px] font-black text-blue-500 uppercase mb-1">Voti PD + M5S</p>
-                                        <p className="text-2xl font-black text-blue-600">+{pdM5STargetTotal}</p>
+                                    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                                        <div>
+                                            <p className="text-[10px] font-black text-blue-500 uppercase mb-1">Voti PD + M5S</p>
+                                            <p className="text-2xl font-black text-blue-600">+{pdM5STargetTotal}</p>
+                                        </div>
                                         <p className="text-[9px] text-slate-500 mt-2">Target Trucchi, Merlo, Guglielmi</p>
                                     </div>
-                                    <div className="bg-blue-600 p-6 rounded-3xl text-white shadow-xl">
-                                        <p className="text-[10px] font-black uppercase opacity-70">Potenziale Totale</p>
-                                        <p className="text-3xl font-black tracking-tighter">{finalProjection}</p>
-                                        <p className="text-[9px] mt-2 opacity-70">Soglia vittoria stimata: 2.650</p>
+                                    <div className="bg-blue-600 p-6 rounded-3xl text-white shadow-xl flex flex-col justify-between relative overflow-hidden">
+                                        <div className="relative z-10">
+                                            <p className="text-[10px] font-black uppercase opacity-70 mb-1">Potenziale Totale</p>
+                                            <p className="text-3xl font-black tracking-tighter">{finalProjection}</p>
+                                        </div>
+                                        
+                                        {/* Valori Simulatore Integrati nel Widget Totale */}
+                                        <div className="relative z-10 mt-4 pt-4 border-t border-blue-500 flex justify-between gap-2">
+                                            <div className="flex-1">
+                                                <p className="text-[8px] font-black uppercase opacity-60 leading-none mb-1">Erosione</p>
+                                                <p className="text-xs font-black">-{prudentialLoss}</p>
+                                            </div>
+                                            <div className="w-[1px] bg-blue-500 shrink-0"></div>
+                                            <div className="flex-1 text-right">
+                                                <p className="text-[8px] font-black uppercase opacity-60 leading-none mb-1">Recupero orfani</p>
+                                                <p className="text-xs font-black">{recoveryRate}%</p>
+                                            </div>
+                                        </div>
+                                        <div className="absolute top-0 right-0 w-16 h-16 bg-white/5 rounded-full -mr-8 -mt-8"></div>
                                     </div>
                                 </div>
 
@@ -548,7 +571,7 @@
                                                 <span className="font-black text-blue-600">+{pdM5STargetTotal}</span>
                                             </div>
                                             <div className="flex justify-between text-slate-500 border-b border-slate-50 pb-2">
-                                                <span>Recupero ({recoveryRate}%)</span>
+                                                <span>Recupero orfani ({recoveryRate}%)</span>
                                                 <span className="font-black text-amber-600">+{recoveredOrphans}</span>
                                             </div>
                                             <div className="pt-4 flex justify-between items-baseline">
