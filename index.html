@@ -57,11 +57,27 @@
         ];
 
         const App = () => {
+            // --- AUTHENTICATION STATE ---
+            const [isAuthenticated, setIsAuthenticated] = useState(false);
+            const [passwordInput, setPasswordInput] = useState('');
+            const [loginError, setLoginError] = useState(false);
+
+            // --- APP STATE ---
             const [activeTab, setActiveTab] = useState('dashboard');
             const [recoveryRate, setRecoveryRate] = useState(50);
             const [prudentialLoss, setPrudentialLoss] = useState(25);
             const [searchQuery, setSearchQuery] = useState('');
             const [expandedCandidate, setExpandedCandidate] = useState(null);
+
+            const handleLogin = (e) => {
+                e.preventDefault();
+                if (passwordInput === 'demer4ever') {
+                    setIsAuthenticated(true);
+                    setLoginError(false);
+                } else {
+                    setLoginError(true);
+                }
+            };
 
             const candidatesData = [
                 { name: "BASSI M.", totals: [35, 10, 23, 15, 15, 24, 34, 30, 22, 25], year: 2018 },
@@ -129,6 +145,50 @@
                 });
             }, [processedCandidates]);
 
+            // Schermata di Login
+            if (!isAuthenticated) {
+                return (
+                    <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
+                        <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md animate-in">
+                            <div className="flex justify-center mb-6">
+                                <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-slate-100 shadow-inner">
+                                    <img src="https://bordigheradomani.it/img/logo.png" alt="Logo" className="w-full h-full object-contain" />
+                                </div>
+                            </div>
+                            <div className="text-center mb-8">
+                                <h1 className="text-2xl font-black text-slate-900 tracking-tight">Area Riservata</h1>
+                                <p className="text-sm text-slate-400 font-bold uppercase tracking-widest mt-1">Candidati Bordighera Domani</p>
+                            </div>
+                            <form onSubmit={handleLogin} className="space-y-4">
+                                <div>
+                                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Password di Accesso</label>
+                                    <input 
+                                        type="password" 
+                                        value={passwordInput}
+                                        onChange={(e) => setPasswordInput(e.target.value)}
+                                        placeholder="••••••••"
+                                        className={`w-full px-4 py-3 bg-slate-50 border-2 rounded-2xl outline-none focus:ring-4 transition-all font-mono ${loginError ? 'border-red-200 focus:ring-red-100' : 'border-slate-100 focus:ring-blue-50'}`}
+                                    />
+                                    {loginError && <p className="text-red-500 text-[10px] font-bold uppercase mt-2 text-center">Password errata. Riprova.</p>}
+                                </div>
+                                <button 
+                                    type="submit"
+                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-blue-200 transition-all uppercase tracking-widest text-xs"
+                                >
+                                    Accedi al Dashboard
+                                </button>
+                            </form>
+                            <div className="mt-8 pt-6 border-t border-slate-50 text-center">
+                                <p className="text-[9px] text-slate-300 font-bold uppercase tracking-widest leading-relaxed">
+                                    I dati contenuti in questo dashboard sono strettamente confidenziali e destinati ai soli membri della lista.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            // Dashboard Principale (già autenticato)
             return (
                 <div className="min-h-screen text-slate-800">
                     <div className="bg-red-600 text-white text-[10px] py-1 text-center font-bold tracking-[0.2em] uppercase">
@@ -150,6 +210,12 @@
                                 </div>
                             </div>
                             <div className="hidden lg:flex items-center gap-4">
+                                <button 
+                                    onClick={() => setIsAuthenticated(false)}
+                                    className="mr-4 text-[10px] font-black text-slate-400 uppercase hover:text-red-500 transition-colors"
+                                >
+                                    Esci
+                                </button>
                                 <div className="px-4 py-1.5 bg-blue-50 rounded-2xl border border-blue-100 flex flex-col items-end">
                                     <p className="text-[9px] text-blue-400 font-bold uppercase leading-none mb-1">Stima Voti</p>
                                     <p className="text-xl font-black text-blue-700 leading-none">{finalProjection}</p>
@@ -439,7 +505,7 @@
                                             {finalProjection >= 2650 ? 'Target Raggiunto' : 'Scenario Rischio'}
                                         </h4>
                                         <p className="text-xs text-blue-300 leading-relaxed max-w-[200px]">
-                                            {finalProjection >= 2650 ? "La soglia governabilità è garantita." : "Necessario incrementare il recupero orfani."}
+                                            {finalProjection >= 2650 ? "La soglia governabilità è garantita." : "Incrementare l'attività sulle zone orfane."}
                                         </p>
                                         <div className="absolute top-0 left-0 w-full h-1 bg-white/10 overflow-hidden">
                                             <div className="bg-blue-400 h-full transition-all duration-500" style={{ width: `${Math.min(100, (finalProjection/2800)*100)}%` }}></div>
