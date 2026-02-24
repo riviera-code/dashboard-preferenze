@@ -118,20 +118,20 @@
                 }
             };
 
-            // --- DATI CERTIFICATI DA VERBALI E SCREENSHOT FORNITI (2018 & 2023) ---
+            // --- DATI CERTIFICATI E VERIFICATI DAGLI SCREENSHOT ---
             const candidatesData = [
-                { name: "BASSI M.", totals: [35, 10, 23, 15, 15, 24, 34, 30, 8, 9], year: 2018 },
-                { name: "ALBANESE A.", totals: [18, 16, 26, 26, 40, 28, 13, 20, 24, 37], year: 2023 },
-                { name: "BALDASSARRE M.", totals: [27, 15, 21, 8, 21, 23, 32, 12, 37, 10], year: 2023 },
-                { name: "DEBENEDETTI F.", totals: [51, 38, 21, 13, 18, 35, 28, 9, 12, 16], year: 2023 },
-                { name: "PIANTONI S.", totals: [51, 10, 20, 11, 15, 20, 24, 14, 22, 12], year: 2023 },
-                { name: "MARIELLA M.", totals: [12, 13, 8, 22, 34, 13, 12, 23, 34, 25], year: 2023 },
-                { name: "ZAGNI M.", totals: [26, 6, 15, 8, 9, 13, 35, 24, 12, 10], year: 2023 },
-                { name: "BERTAINA F.", totals: [19, 23, 21, 23, 14, 3, 8, 11, 8, 19], year: 2018 },
-                { name: "BONAVIA B.", totals: [18, 7, 17, 16, 4, 5, 8, 11, 15, 6], year: 2023 },
-                { name: "DI VITO M.", totals: [17, 12, 10, 8, 4, 11, 21, 2, 5, 11], year: 2023 },
-                { name: "BOZZARELLI M.", totals: [4, 6, 13, 8, 13, 6, 11, 15, 8, 13], year: 2023 },
-                { name: "GAZZANO G.", totals: [12, 6, 5, 13, 14, 3, 21, 5, 7, 5], year: 2023 }
+                { name: "BASSI M.", totals: [35, 10, 23, 15, 15, 24, 34, 30, 8, 9], year: 2018 }, // Screenshot 10.28.40
+                { name: "ALBANESE A.", totals: [18, 16, 26, 26, 40, 28, 13, 20, 24, 37], year: 2023 }, // Screenshot 10.35.14 (TOT 248)
+                { name: "BALDASSARRE M.", totals: [27, 15, 21, 8, 21, 23, 32, 12, 37, 10], year: 2023 }, // Screenshot 10.31.47
+                { name: "DEBENEDETTI F.", totals: [51, 38, 21, 13, 18, 35, 28, 9, 12, 16], year: 2023 }, // Screenshot 10.35.14
+                { name: "PIANTONI S.", totals: [51, 10, 20, 11, 15, 20, 24, 14, 22, 12], year: 2023 }, // Screenshot 10.35.14
+                { name: "MARIELLA M.", totals: [12, 13, 8, 22, 34, 13, 12, 23, 34, 25], year: 2023 }, // Screenshot 10.35.14
+                { name: "ZAGNI M.", totals: [26, 6, 15, 8, 9, 13, 35, 24, 12, 10], year: 2023 }, // Screenshot 10.35.14
+                { name: "BERTAINA F.", totals: [19, 23, 21, 23, 14, 3, 8, 11, 8, 19], year: 2018 }, // Screenshot 10.28.40
+                { name: "BONAVIA B.", totals: [18, 7, 17, 16, 4, 5, 8, 11, 15, 6], year: 2023 }, // Screenshot 10.31.47
+                { name: "DI VITO M.", totals: [17, 12, 10, 8, 4, 11, 21, 2, 5, 11], year: 2023 }, // Screenshot 10.31.47
+                { name: "BOZZARELLI M.", totals: [4, 6, 13, 8, 13, 6, 11, 15, 8, 13], year: 2023 }, // Screenshot 10.31.47
+                { name: "GAZZANO G.", totals: [12, 6, 5, 13, 14, 3, 21, 5, 7, 5], year: 2023 } // Screenshot 10.31.47
             ];
 
             const pdM5SCandidates = [
@@ -139,7 +139,6 @@
                 { name: "GUGLIELMI", target: 140, icon: "user-plus" }
             ];
 
-            // --- DATI ORFANI AGGIORNATI DA SCREENSHOT 10.38.13 ---
             const orphans = [
                 { name: "Filocamo E.", total: 137, distribution: [14, 2, 4, 9, 9, 8, 61, 6, 15, 9], mainSez: "Sasso" },
                 { name: "Moreno A.", total: 151, distribution: [18, 16, 17, 27, 7, 21, 18, 7, 8, 12], mainSez: "Centro-Ovest / B. Alta" },
@@ -204,7 +203,7 @@
                                 <img src="https://bordigheradomani.it/img/logo.png" alt="Logo" className="w-24 h-24 object-contain" />
                             </div>
                             <div className="text-center mb-8">
-                                <h1 className="text-2xl font-bold text-slate-900 uppercase">Area Riservata</h1>
+                                <h1 className="text-2xl font-bold text-slate-900 uppercase tracking-tighter">Area Riservata</h1>
                                 <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mt-1">Bordighera Domani</p>
                             </div>
                             <form onSubmit={handleLogin} className="space-y-4">
@@ -215,12 +214,9 @@
                                 />
                                 {loginError && <p className="text-red-500 text-[10px] font-bold uppercase text-center">Password errata</p>}
                                 <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg transition-all uppercase tracking-widest text-xs">
-                                    Sblocca Dashboard
+                                    Accedi
                                 </button>
                             </form>
-                            <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed">Confidenziale — Solo per i candidati della lista Bordighera Domani</p>
-                            </div>
                         </div>
                     </div>
                 );
@@ -233,13 +229,13 @@
                             <div className="flex items-center gap-4">
                                 <img src="https://bordigheradomani.it/img/logo.png" alt="Logo" className="w-12 h-12 object-contain" />
                                 <div>
-                                    <h1 className="text-xl font-extrabold text-slate-900 leading-none tracking-tight">BORDIGHERA DOMANI</h1>
-                                    <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest mt-1">Election Analytics 2028</p>
+                                    <h1 className="text-xl font-extrabold text-slate-900 leading-none tracking-tight text-blue-900 uppercase italic">Bordighera Domani</h1>
+                                    <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest mt-1 italic">Strategia Elettorale Interna</p>
                                 </div>
                             </div>
                             <div className="hidden md:flex items-center gap-6 text-right">
                                 <div>
-                                    <p className="text-[10px] text-slate-400 font-bold uppercase leading-none mb-1">Potenziale Stimato</p>
+                                    <p className="text-[10px] text-slate-400 font-bold uppercase leading-none mb-1">Stima Finale</p>
                                     <p className="text-2xl font-extrabold text-blue-700 leading-none tracking-tighter">{finalProjection}</p>
                                 </div>
                                 <button onClick={() => setIsAuthenticated(false)} className="p-2 text-slate-400 hover:text-red-500 transition-colors">
@@ -280,7 +276,7 @@
                                             <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Base Storica Attiva</p>
                                             <p className="text-3xl font-extrabold text-slate-900 leading-none">{totalHistorical}</p>
                                         </div>
-                                        <p className="text-[9px] text-slate-400 mt-3 font-bold uppercase tracking-wider">{processedCandidates.length} Candidati Attivi</p>
+                                        <p className="text-[9px] text-slate-400 mt-3 font-bold uppercase tracking-wider">{processedCandidates.length} Candidati Reali</p>
                                     </div>
                                     <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
                                         <div>
@@ -315,29 +311,29 @@
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                    <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-8 shadow-sm text-sm">
-                                        <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-3">
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 text-sm">
+                                    <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-8 shadow-sm">
+                                        <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-3 italic text-blue-900">
                                             <Icon name="info" className="text-blue-600" size={20} />
-                                            Strategia di Lista — Dati Verificati
+                                            Strategia di Lista — Dati Certificati
                                         </h3>
                                         <div className="space-y-4">
                                             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-start gap-4">
                                                 <div className="p-2 bg-blue-100 rounded-xl text-blue-600 font-bold shrink-0">01</div>
-                                                <p className="font-medium text-slate-600 leading-relaxed">
-                                                    <strong>Mappatura Orfani Completa:</strong> I dati degli 8 ex candidati Bassi mostrano picchi a Sasso (Filocamo), Bordighera Alta (Oggero/Zunino) e Arziglia (Traverso). Il recupero di questi 826 voti è la chiave per la governabilità.
+                                                <p className="font-medium text-slate-600 leading-relaxed italic">
+                                                    <strong>Albanese A. (2023):</strong> Integrato il dato nominale di 248 voti certificato dai verbali. La sua forte trazione in Sez. 5 (Pasteur) e Sez. 10 (Due Strade) costituisce una delle roccaforti principali della lista.
                                                 </p>
                                             </div>
                                             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-start gap-4">
                                                 <div className="p-2 bg-blue-100 rounded-xl text-blue-600 font-bold shrink-0">02</div>
-                                                <p className="font-medium text-slate-600 leading-relaxed">
-                                                    <strong>Bilanciamento Geografico:</strong> Mariella e Baldassarre mostrano una forte tenuta in Sez. 9 (Borghetto) e Sez. 7 (Sasso). Proteggere questi flussi dai tentativi di recupero avversari è vitale.
+                                                <p className="font-medium text-slate-600 leading-relaxed italic">
+                                                    <strong>Radicamento Frazioni:</strong> Mariella e Baldassarre mostrano picchi a Borghetto e Sasso. Proteggere questi flussi dai tentativi di recupero avversari è vitale dato l'elevato volume di voti orfani in queste zone.
                                                 </p>
                                             </div>
                                             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-start gap-4">
                                                 <div className="p-2 bg-blue-100 rounded-xl text-blue-600 font-bold shrink-0">03</div>
-                                                <p className="font-medium text-slate-600 leading-relaxed">
-                                                    <strong>Fattore 16:</strong> La squadra conta 12 profili solidi. Completare la lista con 4 nuovi nomi della società civile porterebbe la stima finale verso i 3.000 voti.
+                                                <p className="font-medium text-slate-600 leading-relaxed italic">
+                                                    <strong>Fattore 16:</strong> La squadra conta 12 profili solidi. Completare la lista con 4 nuovi nomi della società civile porterebbe la stima finale verso i 3.000 voti totali.
                                                 </p>
                                             </div>
                                         </div>
@@ -345,7 +341,7 @@
                                     <div className="bg-slate-900 rounded-3xl p-8 text-white shadow-2xl flex flex-col justify-center">
                                         <h3 className="text-xl font-bold mb-4 tracking-tight italic">Completamento Lista</h3>
                                         <p className="text-sm text-slate-400 mb-8 leading-relaxed">
-                                            La proiezione attuale si basa su <strong>12</strong> candidati reali estratti dai verbali 2018/23.
+                                            La proiezione attuale si basa su <strong>12</strong> candidati estratti dai verbali ufficiali 2018/23.
                                         </p>
                                         <div className="space-y-3">
                                             <div className="flex justify-between items-center text-[10px] font-black uppercase">
@@ -365,7 +361,7 @@
                         {activeTab === 'candidates' && (
                             <div className="space-y-4 animate-in">
                                 <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6">
-                                    <h2 className="text-xl font-extrabold text-slate-900 uppercase tracking-tighter italic">Analisi Candidati</h2>
+                                    <h2 className="text-xl font-extrabold text-slate-900 uppercase tracking-tighter italic">Dettaglio Candidati</h2>
                                     <div className="relative w-full md:w-80">
                                         <Icon name="search" className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                         <input 
@@ -391,12 +387,12 @@
                                                     </div>
                                                     <div>
                                                         <h3 className="font-bold text-slate-900 uppercase tracking-tight">{cand.name}</h3>
-                                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Totale Storico {cand.year}: {cand.total} voti</p>
+                                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Totale Certificato {cand.year}: {cand.total} voti</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-6">
                                                     <div className="hidden sm:block text-right">
-                                                        <p className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest">Top Zone</p>
+                                                        <p className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest">Punto Forza</p>
                                                         <p className="text-xs font-bold text-slate-600 uppercase tracking-tighter">{cand.bestSezName}</p>
                                                     </div>
                                                     <Icon name={expandedCandidate === idx ? "chevron-up" : "chevron-down"} className="text-slate-300" size={20} />
@@ -475,25 +471,25 @@
                         )}
 
                         {activeTab === 'sections' && (
-                            <div className="space-y-6 animate-in">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-6 animate-in text-sm">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
                                     {sectionsData.map(sec => (
                                         <div key={sec.id} className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-sm flex flex-col lg:flex-row gap-8">
-                                            <div className="lg:w-1/3 shrink-0 text-center lg:text-left text-sm">
-                                                <p className="text-[10px] font-bold text-blue-600 uppercase mb-3 tracking-widest leading-none">Sezione {sec.id}</p>
+                                            <div className="lg:w-1/3 shrink-0 text-center lg:text-left">
+                                                <p className="text-[10px] font-bold text-blue-600 uppercase mb-3 tracking-widest leading-none text-xs italic">Sezione {sec.id}</p>
                                                 <h3 className="text-2xl font-extrabold text-slate-900 mb-6 leading-tight uppercase italic">{sec.name}</h3>
-                                                <div className="p-6 bg-amber-50 rounded-3xl border border-amber-100 text-center">
-                                                    <p className="text-[10px] font-bold text-amber-500 uppercase mb-1">Potenziale Orfani</p>
+                                                <div className="p-6 bg-amber-50 rounded-3xl border border-amber-100 text-center shadow-inner">
+                                                    <p className="text-[10px] font-bold text-amber-500 uppercase mb-1">Voti Orfani</p>
                                                     <p className="text-3xl font-extrabold text-amber-600 leading-none">{sec.orphanPotential}</p>
-                                                    <p className="text-[8px] font-bold text-amber-400 uppercase mt-2 italic">Voti da recuperare</p>
+                                                    <p className="text-[8px] font-bold text-amber-400 uppercase mt-2 italic">Potenziale da recuperare</p>
                                                 </div>
                                             </div>
                                             <div className="lg:w-2/3">
                                                 <p className="text-[10px] font-bold text-slate-400 uppercase mb-4 tracking-widest">Top 5 Storici in Area</p>
                                                 <div className="space-y-2">
                                                     {sec.top5.map((c, i) => (
-                                                        <div key={i} className="flex justify-between items-center p-3.5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-300 transition-colors">
-                                                            <span className="text-xs font-bold text-slate-700 uppercase tracking-tight">{c.name}</span>
+                                                        <div key={i} className="flex justify-between items-center p-3.5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-300 transition-colors group">
+                                                            <span className="text-xs font-bold text-slate-700 uppercase tracking-tight group-hover:text-blue-700 transition-colors">{c.name}</span>
                                                             <span className="text-sm font-mono font-bold text-blue-600">{c.votes} v</span>
                                                         </div>
                                                     ))}
@@ -506,11 +502,11 @@
                         )}
 
                         {activeTab === 'orphans' && (
-                            <div className="space-y-8 animate-in">
+                            <div className="space-y-8 animate-in text-sm">
                                 <div className="bg-white rounded-[2.5rem] border border-slate-200 p-10 shadow-sm text-center">
-                                    <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight italic uppercase">Mappatura Voti Orfani Certificati</h2>
+                                    <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight italic uppercase text-blue-900">Mappatura Voti Orfani Certificati</h2>
                                     <p className="text-slate-500 text-sm max-w-2xl mx-auto leading-relaxed font-medium uppercase tracking-tighter">
-                                        Analisi sezione per sezione degli ex candidati della lista Bassi (Dati 2023). Questi 826 voti sono l'obiettivo principale per l'espansione.
+                                        Analisi sezione per sezione degli ex candidati della lista Bassi (Dati 2023). Questi 826 voti sono l'obiettivo primario per la crescita.
                                     </p>
                                 </div>
                                 
@@ -533,10 +529,10 @@
                                                 </div>
                                             </div>
                                             <div className="p-8">
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-sm">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                                                     {o.distribution.map((votes, i) => (
                                                         <div key={i} className={`p-4 rounded-2xl border transition-all flex flex-col items-center justify-center gap-1 ${votes > 15 ? 'bg-amber-50 border-amber-200 shadow-sm' : 'bg-white border-slate-100'}`}>
-                                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest truncate w-full text-center">{SECTION_SHORT[i]}</span>
+                                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest truncate w-full text-center italic">{SECTION_SHORT[i]}</span>
                                                             <span className={`text-xl font-mono font-bold ${votes > 15 ? 'text-amber-600' : 'text-slate-700'}`}>{votes}</span>
                                                             <div className="w-full bg-slate-100 h-1 mt-1.5 rounded-full overflow-hidden">
                                                                 <div className="h-full bg-amber-500" style={{ width: `${Math.min(100, (votes / Math.max(...o.distribution)) * 100)}%` }}></div>
@@ -546,7 +542,7 @@
                                                 </div>
                                                 <div className="mt-8 flex items-center gap-4 p-5 bg-blue-50/50 rounded-2xl border border-blue-100">
                                                     <Icon name="info" size={18} className="text-blue-500" />
-                                                    <p className="text-sm font-bold text-slate-900 uppercase tracking-tight">Focus geografico prevalente: <span className="text-blue-700 font-extrabold uppercase">{o.mainSez}</span></p>
+                                                    <p className="font-bold text-slate-900 uppercase tracking-tight">Zona prevalente: <span className="text-blue-700 font-extrabold uppercase italic">{o.mainSez}</span></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -556,24 +552,24 @@
                         )}
 
                         {activeTab === 'simulator' && (
-                            <div className="max-w-4xl mx-auto space-y-8 animate-in text-sm">
+                            <div className="max-w-4xl mx-auto space-y-8 animate-in text-sm italic">
                                 <div className="bg-white rounded-3xl border border-slate-200 p-10 shadow-sm">
-                                    <h2 className="text-2xl font-black text-slate-900 mb-10 flex items-center gap-3 italic uppercase tracking-tighter">
+                                    <h2 className="text-2xl font-black text-slate-900 mb-10 flex items-center gap-3 italic uppercase tracking-tighter text-blue-950">
                                         <Icon name="sliders" className="text-blue-600" />
                                         Predictive Engine 2028
                                     </h2>
                                     <div className="space-y-12">
-                                        <div className="space-y-4">
+                                        <div className="space-y-4 font-bold">
                                             <div className="flex justify-between items-end">
                                                 <div>
                                                     <h4 className="font-bold text-slate-700 text-sm uppercase tracking-widest">Erosione Prudenziale Storici</h4>
-                                                    <p className="text-xs text-slate-400">Voti stimati in perdita media per ogni candidato confermato.</p>
+                                                    <p className="text-xs text-slate-400 font-medium">Numero medio di voti persi per candidato rispetto al miglior dato storico.</p>
                                                 </div>
                                                 <span className="text-2xl font-bold text-red-600 font-mono">-{prudentialLoss}</span>
                                             </div>
                                             <input type="range" min="0" max="100" step="5" value={prudentialLoss} onChange={(e) => setPrudentialLoss(parseInt(e.target.value))} className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer custom-slider accent-red-500" />
                                         </div>
-                                        <div className="space-y-4">
+                                        <div className="space-y-4 font-bold">
                                             <div className="flex justify-between items-end">
                                                 <div>
                                                     <h4 className="font-bold text-slate-700 text-sm uppercase tracking-widest">Recupero Orfani ({totalOrphans} voti)</h4>
@@ -586,10 +582,10 @@
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm font-bold">
                                     <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex flex-col justify-center">
-                                        <h4 className="text-[11px] font-black text-slate-400 uppercase mb-6 tracking-widest">Dati numerici</h4>
-                                        <div className="space-y-4 text-sm font-bold uppercase tracking-tighter">
+                                        <h4 className="text-[11px] font-black text-slate-400 uppercase mb-6 tracking-widest italic">Analisi Numerica</h4>
+                                        <div className="space-y-4 text-sm uppercase tracking-tighter">
                                             <div className="flex justify-between text-slate-500 border-b border-slate-50 pb-2">
                                                 <span>Storico Netto</span>
                                                 <span className="text-slate-800 font-mono italic">{currentPrudential}</span>
@@ -613,10 +609,10 @@
                                             <Icon name="bar-chart-3" size={32} />
                                         </div>
                                         <h4 className="text-xl font-bold mb-1 uppercase tracking-tighter italic">
-                                            {finalProjection >= 2650 ? 'Garantita la Vittoria' : 'Sotto soglia sicurezza'}
+                                            {finalProjection >= 2650 ? 'Vittoria Possibile' : 'Allerta Governabilità'}
                                         </h4>
-                                        <p className="text-xs text-blue-300 leading-relaxed max-w-[200px]">
-                                            {finalProjection >= 2650 ? "I dati confermano la governabilità." : "Necessario incrementare il recupero frazioni."}
+                                        <p className="text-xs text-blue-300 leading-relaxed max-w-[200px] font-medium">
+                                            {finalProjection >= 2650 ? "I dati confermano la maggioranza." : "Necessario agire sul recupero orfani."}
                                         </p>
                                         <div className="absolute top-0 left-0 w-full h-1 bg-white/10 overflow-hidden">
                                             <div className="bg-blue-400 h-full transition-all duration-700" style={{ width: `${Math.min(100, (finalProjection/2800)*100)}%` }}></div>
@@ -629,16 +625,16 @@
 
                     {/* Mobile Footer Data Bar */}
                     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[92%] max-w-lg lg:hidden">
-                        <div className="bg-white/95 backdrop-blur-lg rounded-2xl p-4 border border-slate-200 shadow-2xl flex items-center justify-between">
+                        <div className="bg-white/95 backdrop-blur-lg rounded-2xl p-4 border border-slate-200 shadow-2xl flex items-center justify-between shadow-blue-900/10">
                             <div className="flex items-center gap-3">
                                 <img src="https://bordigheradomani.it/img/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
                                 <div>
-                                    <p className="text-[9px] text-slate-400 font-bold uppercase leading-none mb-1 tracking-widest">Proiezione</p>
+                                    <p className="text-[9px] text-slate-400 font-bold uppercase leading-none mb-1 tracking-widest italic">Proiezione</p>
                                     <p className="text-lg font-bold text-blue-900 leading-none tracking-tighter font-mono">{finalProjection}</p>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <p className="text-[9px] text-slate-400 font-bold uppercase leading-none mb-1 tracking-widest">Obiettivo</p>
+                                <p className="text-[9px] text-slate-400 font-bold uppercase leading-none mb-1 tracking-widest italic">Obiettivo</p>
                                 <p className="text-lg font-bold text-slate-800 leading-none tracking-tight font-mono">2.650</p>
                             </div>
                         </div>
